@@ -60,11 +60,29 @@ export default {
     removeHandler(id) {
       const index = this.list.findIndex(item => item.id === id);
       this.list.PROXY_TARGET.splice(index, 1);
+      const selection = window.getSelection();
       if(this.list.length == 0){
-        // 空数据
+        // 空数据替换成p标签内容
+        let manager = this.$superConfig.blockData.BlockManager
+        let focusId = manager.curentFocusBlock.id;
+        manager.replaceCurrentBlock(this.list,focusId)
       }else{
         // 聚焦上一条
-        console.log(this.$superConfig.blockData,'editor;lfjs')
+        let preIndex = index - 1;
+        let preListItem = this.list[preIndex]
+        let preListDom = document.querySelector(`[id="${preListItem?.id}"]`)
+        if(preListDom){
+           preListDom.focus()
+          if (preListItem.text.length > 0) {
+            let range = document.createRange();
+            range.setStart(preListDom.firstChild,preListItem.text.length)
+            range.setEnd(preListDom.firstChild,preListItem.text.length)
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+         }
+        }
+        console.log('lfjs:removeHandler')
       }
     },
     initData() {

@@ -37,6 +37,13 @@ module.exports = {
             '^/docs': '',
           },
         },
+        // 图片预览
+        '/akb/static':{
+          target: 'http://10.8.4.148:9000',
+          changeOrigin: true,
+          pathRewrite: {
+          },
+        }
       }
     }
   }

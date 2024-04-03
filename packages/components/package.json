@@ -11,7 +11,7 @@
   "license": "ISC",
   "buildOptions": {
     "enter": "src/index.js",
-    "name": "supperDoc",
+    "name": "SuperDoc",
     "formats": [
       "umd"
     ]

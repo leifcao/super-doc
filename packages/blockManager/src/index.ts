@@ -124,6 +124,7 @@ export default class BlockManager extends Module {
     block: null, 
     data:[],
     type: "text",
+    selectionContent:[],// 当前选择的文本内容数组
   }
   public currentSelectionBlockInfo: CurrentCopyBlockInfo = {id: "" ,  // foucsId
     status: 0 , 
@@ -131,6 +132,7 @@ export default class BlockManager extends Module {
     block: null, // 当前focus的实例block
     data:[], // 选择的内容
     type: "text", // 文本类型
+    selectionContent:[]
   }
   // 被复制的block
   public get currentCopyBlock(): Block[]{
@@ -366,20 +368,22 @@ export default class BlockManager extends Module {
     this.currentSelectionBlockInfo = {
       id: "" ,  // foucsId
       status: 0 , 
-      content: "" , // 文本内容string
+      content: "" , // 文本内容HTML
       block: null, // 当前focus的实例block
       data:[], // 选择的内容
       type: "text", // 文本类型
+      selectionContent:[] , // 当前选择的文本内容数组
     }
   }
   public setSelectionBlockInfo(selectionData){
     const {
       id,  // foucsId
       status, 
-      content, // 文本内容string
+      content, // 文本内容HTML
       block, // 当前focus的实例block
-      data, // 选择的内容
+      data, // 选择的block内容
       type, // 文本类型
+      selectionContent
     } = selectionData;
 
     this.currentSelectionBlockInfo = {
@@ -389,6 +393,7 @@ export default class BlockManager extends Module {
       block, // 当前focus的实例block
       data, // 选择的内容
       type, // 文本类型
+      selectionContent, // 选中的文本数组
     }
   }
   public setCurrentBlockInfo(key,object){
@@ -399,6 +404,7 @@ export default class BlockManager extends Module {
       block, // 当前focus的实例block
       data, // 选择的内容
       type, // 文本类型
+      selectionContent
     } = object;
 
     this[key] = {
@@ -408,6 +414,7 @@ export default class BlockManager extends Module {
       block, // 当前focus的实例block
       data, // 选择的内容
       type, // 文本类型
+      selectionContent
     }
   }
 

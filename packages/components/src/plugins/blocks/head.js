@@ -90,7 +90,7 @@
 
 
 
-import { Plugin , generateHeadData } from "@super-doc/api";
+import { Plugin , generateHeadData,complieHTMLToBlockData } from "@super-doc/api";
 import _Head from '../../components/head.vue';
 import * as _ from '@super-doc/share';
 
@@ -127,29 +127,50 @@ export default class Head extends Plugin.BlockBase {
    }
   }
 
+  /**
+   * 粘贴事件
+   * @param {*} context 文档编辑器上下文
+   * @param {*} event 粘贴event
+   * @returns 
+   */
   pasteEventCallBack(context,event){
     console.log(`【superDoc】: 执行粘贴_head`);
     let manager = context.Event["Editor"].BlockManager
     let focusBlock =  manager.curentFocusBlock;
-    let { block, type, status, data} = manager.currentCopyBlockInfo
+    let { block, type, status, data ,selectionContent} = manager.currentCopyBlockInfo
     let deepCloneBlock = _.deepCloneRefreshId(data, [
       "id",
     ]);
-    if(type == "text"){
-      if(!focusBlock.data.text){
-        // var clipboardData = event.clipboardData || window["clipboardData"]; // 获取剪贴板数据对象
-        // var text =
-        // manager.currentCopyBlockInfo.content ||
-        // clipboardData.getData("text/plain"); // 获取纯文本格式的复制内容
-        manager.replaceCurrentBlock(deepCloneBlock, focusBlock.id);
+    // TODO:考虑抽离。因为所有都要这样旁段
+    selectionContent = selectionContent.filter(i=>!!i)
+    var clipboardData = event.clipboardData || window["clipboardData"]; // 获取剪贴板数据对象
+    let clipboardText = clipboardData.getData("text/plain");
+    let textList = clipboardText.split('\r\n').filter(i =>!!i)
+    // 这里是为了校验是否是从外部复制粘贴过来的内容
+    if(textList.every((t,index)=> t == selectionContent[index])){
+      if(type == "text"){
+        if(!focusBlock.data.text){
+          // var clipboardData = event.clipboardData || window["clipboardData"]; // 获取剪贴板数据对象
+          // var text =
+          // manager.currentCopyBlockInfo.content ||
+          // clipboardData.getData("text/plain"); // 获取纯文本格式的复制内容
+          manager.replaceCurrentBlock(deepCloneBlock, focusBlock.id);
+          event.preventDefault();
+          return
+        }
+        // console.log("【superDoc】:执行默认粘贴事件");
+      }else {
+        // 粘贴的是块级节点 , 直接添加到当前节点尾部
+        const currentBlockIndex = manager.blocks.findIndex(block => block.id === focusBlock.id);
+        manager.blocks.splice(currentBlockIndex + 1, 0, ...deepCloneBlock);
         event.preventDefault();
-        return
       }
-      // console.log("【superDoc】:执行默认粘贴事件");
-    }else {
-      // 粘贴的是块级节点 , 直接添加到当前节点尾部
+    }else{
+      let clipboardHTML = clipboardData.getData("text/html") || `${clipboardText.split('\n').map(m=> `<p>${m}</p>`).join('')}`;
+      let blockData = complieHTMLToBlockData.call(context.Event["Editor"],clipboardHTML)
+      console.log("clipboardHTML",blockData)
       const currentBlockIndex = manager.blocks.findIndex(block => block.id === focusBlock.id);
-      manager.blocks.splice(currentBlockIndex + 1, 0, ...deepCloneBlock);
+      manager.blocks.splice(currentBlockIndex + 1, 0, ...blockData);
       event.preventDefault();
     }
    
@@ -160,6 +181,13 @@ export default class Head extends Plugin.BlockBase {
     return _.compileHead(text,instance.data.level)
   }
 
+  /**
+   * 标题栏选中事件回调
+   * @param {*} context 文档编辑器上下文
+   * @param {*} event 
+   * @param {*} copyDom 
+   * @param {*} blockInstance 
+   */
   selectionCallBack(context,event,copyDom, blockInstance){
     console.log(`【superDoc】: 执行选择_head`);
     let manager = context.Editor.BlockManager
@@ -169,5 +197,7 @@ export default class Head extends Plugin.BlockBase {
     // 当前选中节点的id赋值
     headObject.id = blockInstance.id;
     manager.currentSelectionBlockInfo.data.push(headObject)
+    // 构建选中的文本内容
+    manager.currentSelectionBlockInfo.selectionContent.push(text);
   }
 }

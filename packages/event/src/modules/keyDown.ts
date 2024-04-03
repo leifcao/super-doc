@@ -39,7 +39,6 @@ export default class KeyDown {
   }
 
   private keydownHandler = (event: KeyboardEvent) => {
-    console.log('keydownxiaoguokeydownxiaoguokeydownxiaoguokeydownxiaoguokeydownxiaoguo')
     const { BlockManager } = getModules();
     const { curentFocusBlock, blockInstances } = BlockManager;
     if (event.keyCode === keyCodes.UP || event.keyCode === keyCodes.DOWN) {
@@ -207,17 +206,8 @@ export default class KeyDown {
   // bug：删不了表格图片等无编辑状态的内容
   private backspaceEvent(event) {
     const { BlockManager } = this.Event["Editor"];
-    if(this.isCheckAllStatus()){
-      // TODO：待优化，现在全选的删除被代理到了全局
-    }else{
-      const element =
-        BlockManager.curentFocusBlock.element.querySelector(`[block-id]`);
-      if (event.target.childNodes.length === 0) {
-        BlockManager.removeBlock(BlockManager.curentFocusBlock.id);
-        event.preventDefault();
-      } else if (event.target.childNodes.length > 0) {
-      }
-    }
+    console.log('默认删除')
+    return
   }
 
   /**
@@ -230,7 +220,8 @@ export default class KeyDown {
       instance.element.addEventListener("copy", (event: ClipboardEvent) => {
         // event.clipboardData.setData("text", event.target['innerHTML']);
         copyEventByClipboardCallBack.call(that,event,instance)
-        event.preventDefault();
+        // 不去阻止默认的复制事件
+        // event.preventDefault();
       });
       instance.element.addEventListener("paste", (event: ClipboardEvent) => {
         // if(event.target['getAttribute']('id') !== 'superdoc-paragraph') return;

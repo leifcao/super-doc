@@ -340,14 +340,29 @@ function loopComplieNode(container:HTMLElement,blockData:OutputBlockData[]){
  * @returns blockData[]
  */
 export function complieHTMLToBlockData(htmlString:string):OutputBlockData[]{
-  console.log(`【superDoc】:解析html字符串转换成blockData`,htmlString)
-  let container:HTMLBodyElement = document.createElement('body');
-  container.innerHTML = htmlString;
-  let blockData = []
-  loopComplieNode(container,blockData)
-  // 释放节点
-  container.remove()
-  return blockData  
+  let manager = this.BlockManager
+    console.log(`【superDoc】:解析html字符串转换成blockData`,htmlString)
+    let body:HTMLBodyElement = document.createElement('body');
+    body.innerHTML = htmlString;
+    let blockData = []
+    loopComplieNode(body,blockData)
+
+    function loopComplieNode(container,blockData){
+      container.childNodes.forEach((child:HTMLElement)=>{
+        if(child.nodeName == "DIV"){
+          loopComplieNode(child,blockData)
+        }else {
+          let toolPlugin = manager.getToolByNodeName(child.nodeName);
+          toolPlugin && toolPlugin?.complieHTMLToBlockData(child,blockData)
+          if(!toolPlugin){
+            console.log('【superDoc】:解析节点失败，暂无该节点解析器',child)
+          }
+        }
+      })
+    }
+    // 释放节点
+    body.remove()
+    return blockData 
 }
 
 
