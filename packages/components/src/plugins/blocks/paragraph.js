@@ -1,4 +1,4 @@
-import { Plugin ,generateParagraphData } from "@super-doc/api";
+import { Plugin ,generateParagraphData ,complieHTMLToBlockData } from "@super-doc/api";
 import _Paragraph from '../../components/paragraph.vue';
 import * as _ from '@super-doc/share';
 
@@ -36,26 +36,40 @@ export default class Paragraph extends Plugin.BlockBase {
     console.log(`【superDoc】: 执行粘贴_paragraph`);
     let manager = context.Event["Editor"].BlockManager
     let focusBlock =  manager.curentFocusBlock;
-    let { block, type, status, data} = manager.currentCopyBlockInfo
+    let { block, type, status, data, selectionContent} = manager.currentCopyBlockInfo
     let deepCloneBlock = _.deepCloneRefreshId(data, [
       "id",
     ]);
-    if(type == "text"){
-      if(!focusBlock.data.text){
-        // var clipboardData = event.clipboardData || window["clipboardData"]; // 获取剪贴板数据对象
-        // var text =
-        // manager.currentCopyBlockInfo.content ||
-        // clipboardData.getData("text/plain"); // 获取纯文本格式的复制内容
-        // deepCloneBlock[0].data.text = text;
-        manager.replaceCurrentBlock(deepCloneBlock, focusBlock.id);
+    selectionContent = selectionContent.filter(i=>!!i)
+    // TODO:待优化
+    var clipboardData = event.clipboardData || window["clipboardData"]; // 获取剪贴板数据对象
+    let clipboardText = clipboardData.getData("text/plain");
+    let textList = clipboardText.split('\r\n').filter(i =>!!i)
+    // 这里是为了校验是否是从外部复制粘贴过来的内容
+    if(textList.every((t,index)=> t == selectionContent[index])){
+      if(type == "text"){
+        if(!focusBlock.data.text){
+          // var text =
+          // manager.currentCopyBlockInfo.content ||
+          // clipboardData.getData("text/plain"); // 获取纯文本格式的复制内容
+          // deepCloneBlock[0].data.text = text;
+          manager.replaceCurrentBlock(deepCloneBlock, focusBlock.id);
+          event.preventDefault();
+          return
+        }
+        // console.log("【superDoc】:执行默认粘贴事件");
+      }else {
+        // 粘贴的是块级节点 , 直接添加到当前节点尾部
+        const currentBlockIndex = manager.blocks.findIndex(block => block.id === focusBlock.id);
+        manager.blocks.splice(currentBlockIndex + 1, 0, ...deepCloneBlock);
         event.preventDefault();
-        return
       }
-      // console.log("【superDoc】:执行默认粘贴事件");
-    }else {
-      // 粘贴的是块级节点 , 直接添加到当前节点尾部
+    }else{
+      let clipboardHTML = clipboardData.getData("text/html") || `${clipboardText.split('\n').map(m=> `<p>${m}</p>`).join('')}`;
+      let blockData = complieHTMLToBlockData.call(context.Event["Editor"],clipboardHTML)
+      console.log("clipboardHTML",blockData)
       const currentBlockIndex = manager.blocks.findIndex(block => block.id === focusBlock.id);
-      manager.blocks.splice(currentBlockIndex + 1, 0, ...deepCloneBlock);
+      manager.blocks.splice(currentBlockIndex + 1, 0, ...blockData);
       event.preventDefault();
     }
    
@@ -72,13 +86,15 @@ export default class Paragraph extends Plugin.BlockBase {
      }
   }
 
-  selectionCallBack(context,event,copyDom, blockInstance){
+  selectionCallBack(context,event,selectionDom, blockInstance){
     console.log(`【superDoc】: 执行选中回调_paragraph`);
     let manager = context.Editor.BlockManager
-    let text = copyDom.querySelector("#superdoc-paragraph").innerHTML
+    let text = selectionDom.querySelector("#superdoc-paragraph").innerHTML
     let paragraphObject = generateParagraphData()
     paragraphObject.data.text = text;
     paragraphObject.id = blockInstance.id
     manager.currentSelectionBlockInfo.data.push(paragraphObject)
+    // 记录选择的文本
+    manager.currentSelectionBlockInfo.selectionContent.push(text);
   }
 }

@@ -95,6 +95,7 @@ export default class ListDoc extends Plugin.BlockBase {
     listDocArr.forEach((item)=>{
       // _.generateBlockId()
       listObject.data.list.push({id: item.getAttribute('id'),text:item.innerHTML})
+      manager.currentSelectionBlockInfo.selectionContent.push(item.innerHTML);
     })
     listObject.id = blockInstance.id;
     manager.currentSelectionBlockInfo.data.push(listObject)

@@ -6,7 +6,7 @@
       contenteditable="true"
       :content="content.text"
       @contentChange="contentChange"
-      style="margin: 8px 0; padding: 0 0; line-height: 1.7"
+      style="margin: 0px 0px 8px 0px; padding: 0 0; line-height: 1.7"
       class="super-input"
     >
     </SuperDocInput>

@@ -35,4 +35,16 @@ export default class ImageTool extends Plugin.ToolPluginBase {
     deComplieBlockDataToHTML(block){
       return `<div class="">\r\n <img alt="${block.data.desc}" src="${block.data.url}" />\r\n </div>`
     }
+
+    checkMdToolType(str){
+        let exp = /!\[.*?\]\(.*?\)/
+        return exp.test(str)
+    }
+    // md 转blockdata image
+    compileMdToBlockData(str,blockData){
+      let urlList = str.match(/\((.*?)\)/)
+      let descList = str.match(/\[(.*?)\]/)
+      blockData.push(_.compileImageData({desc:descList[1],url:urlList[1]}))
+    }
+
 }

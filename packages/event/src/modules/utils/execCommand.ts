@@ -45,6 +45,7 @@ export const copyEventByClipboardCallBack = function (
   manager.currentCopyBlockInfo.block = instance;
   manager.currentCopyBlockInfo.data = [];
   manager.currentCopyBlockInfo.content = "";
+  manager.currentCopyBlockInfo.selectionContent = manager.currentSelectionBlockInfo.selectionContent
   // 设置为文本类型
   if (manager.currentSelectionBlockInfo.type == "text") {
     manager.currentCopyBlockInfo.type = "text";
@@ -71,6 +72,12 @@ export const copyEventByClipboardCallBack = function (
       let copyEventCallBack = block.target?.state?.instance?.copyEventCallBack;
       copyEventCallBack && copyEventCallBack(that, event, block.target.state);
     });
+    // 设置复制文本的内容
+    event.clipboardData?.setData(
+      "text/plain",
+      manager.currentCopyBlockInfo.selectionContent.join('\r\n')
+    );
+    event.preventDefault()
   }
 };
 
@@ -124,6 +131,7 @@ export const pasteEventByClipboardCallBack = function (event: ClipboardEvent) {
     let clipboardData = event.clipboardData;
     let pasteEventCallBack = focusBlock.instance.pasteEventCallBack;
     // let { block, type, status, data } = manager.currentCopyBlockInfo;
+    // TODO:优化不仅仅只有文件的情况
     if (clipboardData.types.includes("Files")) {
       pasteFile(that, event);
     } else if (pasteEventCallBack) {
@@ -151,6 +159,7 @@ export const cutEventByClipboardCallBack = function (
     let selectedRange = selection.getRangeAt(0);
     manager.currentCopyBlockInfo.block = instance;
     manager.currentCopyBlockInfo.data = [];
+    manager.currentCopyBlockInfo.selectionContent = [];
     // 设置为文本类型
     if (manager.currentSelectionBlockInfo.type == "text") {
       manager.currentCopyBlockInfo.type = "text";
@@ -213,6 +222,7 @@ export const getSelectionBlockData = function (
     manager.currentSelectionBlockInfo.id = instance.id;
     manager.currentSelectionBlockInfo.block = instance;
     manager.currentSelectionBlockInfo.data = [];
+    manager.currentSelectionBlockInfo.selectionContent = [];
     if (selectFragment.innerHTML) {
       // 如何存在选择内容
       let selectedBlock = selectFragment.querySelectorAll("[block-id]") || [];
@@ -226,6 +236,7 @@ export const getSelectionBlockData = function (
           instance,
           selectFragment.innerHTML
         );
+        manager.currentSelectionBlockInfo.selectionContent = [selectedRange.toString()];
         if (childNode) {
           manager.currentSelectionBlockInfo.data = [];
           let blockId = childNode.getAttribute("parent-id");

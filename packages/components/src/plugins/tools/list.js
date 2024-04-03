@@ -38,4 +38,17 @@ export default class ListTool extends Plugin.ToolPluginBase {
   deComplieBlockDataToHTML(block){
     return `<${block.data.type}>${block.data.list.map(item=>{ return `<li>${item.text}</li>`}).join('\r\n')}</${block.data.type}>`
   }
+
+  // checkMdToolType(str){
+  //   if(str.startsWith("- ")){
+  //     return true
+  //   }
+  //   if(str.startsWith("+ ")){
+  //     return true
+  //   }
+  // }
+
+  // compileMdToBlockData(str,blockData){
+  //   blockData.push(..._.compileListData(str))
+  // }
 }

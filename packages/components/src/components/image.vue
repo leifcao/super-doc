@@ -19,8 +19,9 @@
         将文件拖到此处，或<em>点击上传</em>
       </div>
     </el-upload>
-    <div v-else>
-      <el-image :src="imagePath" :preview-src-list="[imagePath]"></el-image>
+    <!-- 图片支持删除 -->
+    <div v-else contenteditable="true" @keydown="imageKeydown">
+      <el-image contenteditable="true" :src="imagePath" :preview-src-list="[imagePath]"></el-image>
     </div>
   </div>
 </template>
@@ -37,6 +38,7 @@ import { getBlockData,uploadImage } from "@super-doc/api";
 import {
   getModules,
 } from "@super-doc/share";
+import { event } from '../../../api/dist/api.esm-bundler.js';
 export default {
   data() {
     return {
@@ -58,6 +60,15 @@ export default {
       this.imagePath = url
       this.blockData.data.file = event.file;
       this.blockData.data.upload = true;
+    },
+    imageKeydown(event){
+      if(event.keyCode == 8){
+        let manager = this.$superConfig.blockData.BlockManager
+        manager.removeBlock(this.blockId)
+        event.preventDefault();
+      }else{
+        event.preventDefault();
+      }
     },
     // 不严谨判断 ,暂时处理
     isBase64(str){

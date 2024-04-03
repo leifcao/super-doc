@@ -12,7 +12,7 @@ import { event, generateParagraphData } from "@super-doc/api";
 import { BlockInstance } from "@super-doc/types";
 
 import KeyDown from "./modules/keyDown";
-import { getSelectionBlockData } from "./modules/utils/execCommand";
+import { copyEventByClipboardCallBack, getSelectionBlockData } from "./modules/utils/execCommand";
 
 export default class Event extends Module {
   [x: string]: any;
@@ -41,6 +41,11 @@ export default class Event extends Module {
     this.registerBlankAreaEvent();
     this.registerMenuEvent();
     this.regiterateGlobalClickEvent();
+    // this.documentCopyEvent = this.bindEventListener(document,"copy",(event)=>{
+    //   console.log('evnent:lfjs',event)
+    //   let manager = this.Editor.BlockManager;
+    //   copyEventByClipboardCallBack.call({Event:this},event,manager.curentFocusBlock)
+    // })()
   }
 
   /**
@@ -144,13 +149,12 @@ export default class Event extends Module {
     // BUGGER 事件触发了两次
     console.log('【super_doc】block点击')
     if(!document.contains(event.currentTarget)) return;
+    this.setContentEdiableBySelector("false")
     const [id] = getBlockIdForElement(event.currentTarget);
     this.Editor.BlockManager.changeCurrentBlockId(id);
     this.Editor.BlockManager.cursor.block = this.Editor.BlockManager.curentFocusBlock;
     this.Editor.UI.command.visible = false;
     this.Editor.UI.layout.visible = false;
-    this.setContentEdiableBySelector("false")
-
   }
 
   public setContentEdiableBySelector(contenteditable: string){
@@ -230,6 +234,7 @@ export default class Event extends Module {
       (event:any) => {
         if(window.getSelection().isCollapsed){
           event.target.focus();
+          console.log('focus')
           this.Editor.BlockManager.clearSelectionBlockInfo();
         }
         if (event.target !== editorZoneElement) return;
@@ -295,37 +300,54 @@ export default class Event extends Module {
     let manager = this.Editor.BlockManager;
     let curentFocusBlock = manager.curentFocusBlock;
     let  that = this;
-    if (event.keyCode === keyCodes.BACKSPACE) {
-      let selection = window.getSelection();
-      let selectedRange 
-      if(selection.type !== "None"){
-        selectedRange = selection?.getRangeAt(0);
-      }
-      if(manager.currentSelectionBlockInfo.data.length!==0 && manager.currentSelectionBlockInfo.type == 'block'){
-        if(that.keyDownInstance.isCheckAllStatus()){
-          JSON.parse(JSON.stringify(manager.currentSelectionBlockInfo.data)).forEach((item,index)=>{
-              manager.removeBlock(item.id);
-          })
-          event.preventDefault()
-          return
+    const editorZoneElement = $.querySelector(
+      `.${this.Editor.UI.CSS.editorZone}`
+    );
+    let selection = window.getSelection();
+
+    if(!editorZoneElement) return;
+    if(editorZoneElement.contains(event.target) || editorZoneElement.contains(selection.focusNode)){
+      if (event.keyCode === keyCodes.BACKSPACE) {
+        console.log("lfjs:全局删除")
+        let selectedRange 
+        if(selection.type !== "None"){
+          selectedRange = selection?.getRangeAt(0);
         }
-        // 清除选中内容
-        selectedRange && selectedRange.extractContents();
-        manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
-          let block = manager.findBlockInstanceForId(item.id);
-          // 逻辑是选取的内容中间全部去除。执行剪切事件。 (不严谨暂时处理)
-          if(index == 0 || manager.currentSelectionBlockInfo.data.length - 1 ==index){
-            let cutEventCallBack  = block.target?.state?.instance?.cutEventCallBack
-            cutEventCallBack && cutEventCallBack({Event:that},event,item,block.target.state)
-          }else{
-            manager.removeBlock(item.id);
+        if(manager.currentSelectionBlockInfo.data.length!==0 && manager.currentSelectionBlockInfo.type == 'block'){
+          if(that.keyDownInstance.isCheckAllStatus()){
+            JSON.parse(JSON.stringify(manager.currentSelectionBlockInfo.data)).forEach((item,index)=>{
+                manager.removeBlock(item.id);
+            })
+            event.preventDefault()
+            return
           }
-        })
-        event.preventDefault()
-      }else if(manager.currentBlockId && curentFocusBlock.type=="ImageDoc"){
-        // manager.removeBlock(manager.currentBlockId);
-      }
-    } 
+          // 清除选中内容
+          selectedRange && selectedRange.extractContents();
+          manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
+            let block = manager.findBlockInstanceForId(item.id);
+            // 逻辑是选取的内容中间全部去除。执行剪切事件。 (不严谨暂时处理)
+            if(index == 0 || manager.currentSelectionBlockInfo.data.length - 1 ==index){
+              let cutEventCallBack  = block.target?.state?.instance?.cutEventCallBack
+              cutEventCallBack && cutEventCallBack({Event:that},event,item,block.target.state)
+            }else{
+              manager.removeBlock(item.id);
+            }
+          })
+          manager.clearSelectionBlockInfo()
+          event.preventDefault()
+        }else if(manager.currentBlockId && curentFocusBlock.type== "ImageDoc"){
+          // 删除图片
+          manager.removeBlock(manager.currentBlockId);
+        }else if(manager.currentSelectionBlockInfo.type == 'text'){
+          selectedRange && selectedRange.extractContents();
+          if(event.target.childNodes.length == 0){
+            manager.removeBlock(manager.curentFocusBlock.id);
+          }else if(event.target.childNodes.length == 1 && event.target.childNodes[0].tagName == "BR"){
+            manager.removeBlock(manager.curentFocusBlock.id);
+          }
+        }
+      } 
+    }
   }
 
   mouseMoveHandler(event){
@@ -336,11 +358,11 @@ export default class Event extends Module {
 
   // 注销事件
   public destory(){
-    this.mouseMoveEvent();
-    this.mouseDownEvent()
-    this.mouseUpEvent()
-    this.selectionChangeEvent()
-    this.windowKeyDownEvent()
+    this.mouseMoveEvent && this.mouseMoveEvent();
+    this.mouseDownEvent && this.mouseDownEvent()
+    this.mouseUpEvent && this.mouseUpEvent()
+    this.selectionChangeEvent&&  this.selectionChangeEvent()
+    this.windowKeyDownEvent && this.windowKeyDownEvent()
   }
 
 

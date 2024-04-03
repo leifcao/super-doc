@@ -8,7 +8,9 @@
 
 <script>
 import axios from "../../../axios.min.js";
-import superDoc from "../../../packages/core/dist/core.esm-bundler.js";
+import Vue from 'vue'
+window.Vue = Vue;
+import SuperDoc  from "../../../packages/core/dist/core.esm-bundler.js";
 import {
   AuaeTool,
   FullTextTranslationEnglishTool,
@@ -312,7 +314,7 @@ export default {
       );
     },
     initSuperDoc() {
-      window.superDoc = new superDoc({
+      window.superDoc = new SuperDoc({
         isReadOnly: false,
         tools: {
           toolbar: {
@@ -328,7 +330,8 @@ export default {
           menu: [],
         },
       });
-      window.superDoc.setData([
+      window.superDoc.setData(
+        [
     {
         "id": "ec4e6666-6165-4a39-9e9f-828f5e34a904",
         "type": "Paragraph",
@@ -367,15 +370,56 @@ export default {
         "class": "Paragraph"
     },
     {
-        "id": "b975a222-c3ad-47e1-bdc8-bc3a38a3541a",
+        "type": "ListDoc",
+        "data": {
+            "type": "ol",
+            "list": [
+                {
+                    "text": "33",
+                    "id": "c41fc16f-bd57-4a1e-b47c-dc6d21bc8ed3"
+                },
+                {
+                    "text": "33111]",
+                    "id": "94506c99-9bb6-46f3-8e2b-5cfffd33d516"
+                },
+                {
+                    "text": "",
+                    "id": "8a78f215-08fc-4bcd-a2bb-f1df4011b829"
+                }
+            ]
+        },
+        "class": "ListDoc",
+        "id": "1fb88c85-3038-40d4-9cd7-00035c32b625"
+    },
+    {
+        "id": "f6fd0700-d1e7-4d9e-9ea6-88473361c757",
         "type": "Paragraph",
         "data": {
-            "text": "asdflj&nbsp;",
+            "text": "",
+            "translate": ""
+        },
+        "class": "Paragraph"
+    },
+    {
+        "id": "ef2259fe-82f4-4ed1-82ea-4cd49d95b0a2",
+        "type": "Paragraph",
+        "data": {
+            "text": "<span style=\"outline: none;\" tabindex=\"0\">Yjs特性:dddd</span>",
+            "translate": ""
+        },
+        "class": "Paragraph"
+    },
+    {
+        "id": "f6ebb070-8035-4c36-b920-43ab2276657d",
+        "type": "Paragraph",
+        "data": {
+            "text": "<span style=\"outline: none;\" tabindex=\"0\"><font face=\"Times New Roman\" tabindex=\"0\" style=\"outline: none;\">•</font><font face=\"宋体\" tabindex=\"0\" style=\"outline: none;\">其API类</font></span><span style=\"outline: none;\" tabindex=\"0\"><font face=\"宋体\" tabindex=\"0\" style=\"outline: none;\">似dddddddddddd</font></span>",
             "translate": ""
         },
         "class": "Paragraph"
     }
-])
+]
+      )
     },
     getEventList(event, parent) {
       // eventList
@@ -489,7 +533,13 @@ export default {
       this.bindPostMessage();
       this.getData();
     }
-    this.initSuperDoc();
+    let self = this
+    window.onload = ()=>{
+      self.initSuperDoc();
+    }
+
+
+      // self.initSuperDoc();
     // addListener('add', (block) => {
     //   console.log('新增了！');
     // })

@@ -135,7 +135,7 @@ export default {
     handlerAbandon() {
       this.aiOutput = "";
       this.$refs.aiInput.focus();
-    },
+          },
     handlerRegenerate() {
       this.requestAiApi();
     },
@@ -148,6 +148,10 @@ export default {
       );
       // console.log(blocks);
       this.$replaceCurrentBlock(blocks, this.$superConfig.blockId);
+      // 销毁ai事件内容
+       this.$options.beforeDestroy.forEach(hook => {
+        hook.call(this);
+      });
     },
     generateAiContent(event) {
       if (event.keyCode === 13) {

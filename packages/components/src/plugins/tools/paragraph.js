@@ -20,13 +20,25 @@ export class ParagraphTool extends Plugin.ToolPluginBase {
       div.textContent = "H";
       return div;
     }
+    // str解析成blockData
     complieHTMLToBlockData(node,blockData){
-      if(typeof node.innerHTML !== "undefined") 
-        blockData.push(..._.compileParagraph(node.innerHTML))
+      if(typeof node.innerHTML !== "undefined") {
+        // 为了能够每个元素都能编辑，遍历元素追加内容
+        this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+        blockData.push(..._.compileParagraph(node.innerHTML.split("\n").join('')))
+
+      }
+        // blockData.push(..._.compileParagraph(node.innerHTML))
     }
 
+    // 反解析成htmlstring
     deComplieBlockDataToHTML(block){
       return  `<p>${block.data.text}</p>`
+    }
+
+    // md默认转换为blockData
+    compileMdToBlockData(str,blockData){
+      blockData.push(..._.compileParagraph(str))
     }
    
 }

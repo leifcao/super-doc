@@ -23,7 +23,9 @@ export default {
   props: ['listData', 'isFocus', 'type',"blockId"],
   methods: {
     keydownHandler(event) {
-      if (event.keyCode === 13 && this.listData.text) {
+      console.log('lfjs:list删除')
+      // 回车添加
+      if (event.keyCode === 13) {
         event.preventDefault();
         event.stopPropagation();
         this.$emit('addHandler', this.listData.id);
@@ -41,7 +43,6 @@ export default {
       }
     },
     contentChange(content) {
-      console.log('coentettetnentnetnntnentnentn ')
       this.$emit("updateContent", {id: this.listData.id, content: event.target.innerHTML});
     }
   },

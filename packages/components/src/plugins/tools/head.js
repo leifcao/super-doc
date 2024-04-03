@@ -28,12 +28,23 @@ export class HeadTool1 extends Plugin.ToolPluginBase {
     return div;
   }
   complieHTMLToBlockData(node,blockData){
-    if(typeof node.innerHTML !== "undefined") 
-      blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
+    if(typeof node.innerHTML !== "undefined") {
+      this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+      blockData.push(..._.compileHead(node.innerHTML.split("\n").join(''),node.nodeName.toLowerCase()))
+    }
   }
   deComplieBlockDataToHTML(block){
     return `<${block.data.level}>${block.data.text}</${block.data.level}>`
   }
+
+  checkMdToolType(str){
+    return /^#[^#]*$/.test(str);
+  }
+
+  compileMdToBlockData(str,blockData){
+    blockData.push(..._.compileHead(str.replace('#', ''), 'h1'))
+  }
+
 }
 export class HeadTool2 extends Plugin.ToolPluginBase {
   type = "Head";
@@ -61,11 +72,22 @@ export class HeadTool2 extends Plugin.ToolPluginBase {
     return div;
   }
   complieHTMLToBlockData(node,blockData){
-    if(typeof node.innerHTML !== "undefined") 
-      blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
+    if(typeof node.innerHTML !== "undefined") {
+      this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+      blockData.push(..._.compileHead(node.innerHTML.split("\n").join(''),node.nodeName.toLowerCase()))
+    }
+    // blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
   }
   deComplieBlockDataToHTML(block){
     return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+  }
+
+  checkMdToolType(str){
+    return /^##[^#]*$/.test(str);
+  }
+
+  compileMdToBlockData(str,blockData){
+    blockData.push(..._.compileHead(str.replace('##', ''), 'h2'))
   }
 }
 export class HeadTool3 extends Plugin.ToolPluginBase {
@@ -93,11 +115,21 @@ export class HeadTool3 extends Plugin.ToolPluginBase {
     return div;
   }
   complieHTMLToBlockData(node,blockData){
-    if(typeof node.innerHTML !== "undefined") 
-      blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
+    if(typeof node.innerHTML !== "undefined") {
+      this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+      blockData.push(..._.compileHead(node.innerHTML.split("\n").join(''),node.nodeName.toLowerCase()))
+    }
   }
   deComplieBlockDataToHTML(block){
     return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+  }
+
+  checkMdToolType(str){
+    return /^###[^#]*$/.test(str);
+  }
+  
+  compileMdToBlockData(str,blockData){
+    blockData.push(..._.compileHead(str.replace('###', ''), 'h3'))
   }
 }
 export class HeadTool4 extends Plugin.ToolPluginBase {
@@ -126,11 +158,21 @@ export class HeadTool4 extends Plugin.ToolPluginBase {
     return div;
   }
   complieHTMLToBlockData(node,blockData){
-    if(typeof node.innerHTML !== "undefined") 
-      blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
+    if(typeof node.innerHTML !== "undefined") {
+      this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+      blockData.push(..._.compileHead(node.innerHTML.split("\n").join(''),node.nodeName.toLowerCase()))
+    }
   }
   deComplieBlockDataToHTML(block){
     return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+  }
+
+  checkMdToolType(str){
+    return /^####[^#]*$/.test(str);
+  }
+
+  compileMdToBlockData(str,blockData){
+    blockData.push(..._.compileHead(str.replace('####', ''), 'h4'))
   }
 }
 export class HeadTool5 extends Plugin.ToolPluginBase {
@@ -159,12 +201,23 @@ export class HeadTool5 extends Plugin.ToolPluginBase {
     return div;
   }
   complieHTMLToBlockData(node,blockData){
-    if(typeof node.innerHTML !== "undefined") 
-      blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
+    if(typeof node.innerHTML !== "undefined") {
+      this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+      blockData.push(..._.compileHead(node.innerHTML.split("\n").join(''),node.nodeName.toLowerCase()))
+    }
+      // blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
   }
   deComplieBlockDataToHTML(block){
     return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+  }
 
+  checkMdToolType(str){
+    return /^#####[^#]*$/.test(str);
+
+  }
+
+  compileMdToBlockData(str,blockData){
+    blockData.push(..._.compileHead(str.replace('("#####', ''), 'h5'))
   }
 }
 export class HeadTool6 extends Plugin.ToolPluginBase {
@@ -193,8 +246,10 @@ export class HeadTool6 extends Plugin.ToolPluginBase {
   }
 
   complieHTMLToBlockData(node,blockData){
-    if(typeof node.innerHTML !== "undefined") 
-      blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
+    if(typeof node.innerHTML !== "undefined") {
+      this.loopAddStyle(node,{outline:"none",},{ tabIndex: 0 })
+      blockData.push(..._.compileHead(node.innerHTML.split("\n").join(''),node.nodeName.toLowerCase()))
+    }
   }
 
   deComplieBlockDataToHTML(block){
