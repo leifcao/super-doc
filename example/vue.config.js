@@ -13,12 +13,11 @@ module.exports = {
           pathRewrite: {
           },
         },
-        '/imagePreview': {
-          target: 'http://10.8.4.148:9000',
+        '/tapd_wikis': {
+          target: 'https://api.tapd.cn',
           changeOrigin: true,
           pathRewrite: {
             pathRewrite: {
-              '^/imagePreview': '',
             },
           },
         },

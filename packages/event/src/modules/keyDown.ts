@@ -44,17 +44,26 @@ export default class KeyDown {
     if (event.keyCode === keyCodes.UP || event.keyCode === keyCodes.DOWN) {
       this.checkoutBlockEvent(event);
     } else if (event.keyCode === keyCodes.BACKSPACE) {
-      this.backspaceEvent(event);
+      // this.backspaceEvent(event);
     } else if (event.keyCode === keyCodes.ENTER) {
       this.enterEvent(event);
     } else if (
       (event.metaKey || event.ctrlKey) &&
       event.keyCode === keyCodes.A
     ) {
-      curentFocusBlock.CURRENT_CHECKOUT_COUNT += 1;
+      // curentFocusBlock.CURRENT_CHECKOUT_COUNT += 1;  // 取消三次ctrl+a的全选机制，符合用户操作习惯
+      curentFocusBlock.CURRENT_CHECKOUT_COUNT = 3;
       if(curentFocusBlock.CHECKOUT_ALL_NUMBER == curentFocusBlock.CURRENT_CHECKOUT_COUNT){
         // 设置全选数据
-        BlockManager.setSelectionBlockInfo({id:curentFocusBlock.id,content:"",block:curentFocusBlock,data:BlockManager.blocks,type : "block"})
+        // let selectionContent = BlockManager.blocks
+        window.getSelection().removeAllRanges();
+        let selectedRange = document.createRange();
+        let startBlock = BlockManager.blockInstances[0]
+        let endBlock = BlockManager.blockInstances.slice(-1)[0]
+        selectedRange.setStartBefore(startBlock.element)
+        selectedRange.setEndAfter(endBlock.element)
+        window.getSelection().addRange(selectedRange)
+        // BlockManager.setSelectionBlockInfo({id:curentFocusBlock.id,content:"",block:curentFocusBlock,data:BlockManager.blocks,type : "block"})
       }
       if(curentFocusBlock.CURRENT_CHECKOUT_COUNT < curentFocusBlock.CHECKOUT_BLOCK_NUMBER ) return;
       event.preventDefault();
@@ -82,6 +91,7 @@ export default class KeyDown {
       console.log(event.keyCode,'yyjs');
       event.preventDefault();
     }
+    
     
   };
 

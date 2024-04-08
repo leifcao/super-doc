@@ -74,15 +74,26 @@ export default class Paragraph extends Plugin.BlockBase {
     }
    
   }
-
+  /** 
+   * 剪切数据，返回最终被剪切后的结果
+   * @param {*} context 文档编辑器上下文
+   * @param {*} event 事件
+   * @param {*} cutData 剪切的数
+   * @param {*} blockInstance block实例
+   * @returns 
+   */
   cutEventCallBack(context,event,cutData, blockInstance){
     console.log(`【superDoc】: 执行剪切_paragraph`);
     let manager = context.Event.Editor.BlockManager;
     let text = blockInstance.element.querySelector("[block-id]").firstChild?.innerHTML || "";
     if(!text){
-      manager.removeBlock(cutData.id);
+      // manager.removeBlock(cutData.id);
+      return
      }else{
-      blockInstance.data.text = text;
+      let paragraph = generateParagraphData()
+      paragraph.data.text = text;
+      paragraph.id = blockInstance.id
+      return paragraph
      }
   }
 
