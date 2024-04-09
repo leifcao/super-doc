@@ -18,7 +18,9 @@ import { showCommand, syncDom, markdownSyntaxTransform, bindMenu } from "@super-
 export default {
   props: ["content", "contenteditable", "params"],
   data() {
-    return {};
+    return {
+      inputTimer: null ,//防抖输入处理
+    };
   },
   watch:{
     content(newVal,oldVal){
@@ -47,7 +49,10 @@ export default {
     contentChange(event) {
       if (!event.target.childNodes) return;
       this.quickTransform(event);
-      this.$emit('contentChange', {content: markdownSyntaxTransform(event.target.innerHTML), params: this.params});
+      clearTimeout(this.inputTimer)
+      this.inputTimer = setTimeout(()=>{
+        this.$emit('contentChange', {content: markdownSyntaxTransform(event.target.innerHTML), params: this.params});
+      },300)
     },
     syncDom(newDom) {
       syncDom(this.$refs['super-paragraph'], newDom);

@@ -213,6 +213,7 @@ export default class BlockManager extends Module {
           }
         },
       },
+      context: this, // 块处理器上下文
     }).target;
   }
   private instanceBlocks() {

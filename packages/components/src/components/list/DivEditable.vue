@@ -8,7 +8,7 @@
       style="width: 100%; min-height: 22px"
       :id="listData.id"
       :key="listData.id"
-      @keydown.stop="keydownHandler"
+      @keydown="keydownHandler"
       @input.stop.self="contentChange"
     ></div>
   </div>
@@ -21,16 +21,31 @@ import {
 
 export default {
   props: ['listData', 'isFocus', 'type',"blockId"],
+  data(){
+    return {
+      inputTimer: null // 防抖处理
+    }
+  },
+  watch:{
+    'listData.text'(newVal,oldVal){
+      this.init()
+    }
+  },
   methods: {
     keydownHandler(event) {
-      console.log('lfjs:list删除')
       // 回车添加
       if (event.keyCode === 13) {
         event.preventDefault();
-        event.stopPropagation();
+        // 阻止冒泡
+        event.stopImmediatePropagation();
         this.$emit('addHandler', this.listData.id);
-      } else if(event.keyCode === 8 && !this.listData.text) {
-        this.$emit('remove', this.listData.id);
+      } else if(event.keyCode === 8) {
+        console.log('【superDoc】list删除')
+        if(!this.listData.text){
+          this.$emit('remove', this.listData.id);
+        }
+        // 阻止冒泡
+        event.stopImmediatePropagation();
       }
     },
     init() {
@@ -42,8 +57,11 @@ export default {
         this.$refs['list-content'].focus(); 
       }
     },
-    contentChange(content) {
-      this.$emit("updateContent", {id: this.listData.id, content: event.target.innerHTML});
+    contentChange(event) {
+      clearTimeout(this.inputTimer);
+      this.inputTimer = setTimeout(() => {
+        this.$emit("updateContent", {id: this.listData.id, content: event.target.innerHTML});
+      }, 300);
     }
   },
   mounted() {

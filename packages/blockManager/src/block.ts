@@ -45,7 +45,7 @@ export class Block {
       this._CURRENT_CHECKOUT_COUNT = count;
       this.BlockManager.cursor.removeAllRanges();
     } else if (count === this.CHECKOUT_ALL_NUMBER) {
-      this.BlockManager.checkAllStatus(true);
+      // this.BlockManager.checkAllStatus(true);
       this._CURRENT_CHECKOUT_COUNT = count;
       this.BlockManager.cursor.removeAllRanges();
     } else if (count === 0){

@@ -28,29 +28,43 @@ export default class ListDoc extends Plugin.BlockBase {
     // })
     // manager.currentCopyBlockInfo.data.push(listObject)
   }
-  cutEventCallBack(context,event,cutData, blockInstance){
+  /**
+   * 剪切数据，返回最终被剪切后的结果
+   * @param {*} context 文档编辑器上下文
+   * @param {*} event 事件
+   * @param {*} cutData 剪切的数
+   * @param {*} blockInstance block实例
+   * @returns 
+   */
+  cutEventCallBack(context, event, cutData, blockInstance){
     console.log(`【superDoc】: 执行剪切_ListDoc`,cutData,blockInstance);
     let manager = context.Event.Editor.BlockManager;
     let listDoc = blockInstance.element.querySelectorAll("[id]");
+    // 处理被剪切后所应展示的内容
     if(listDoc.length==0){
-      manager.removeBlock(cutData.id);
+      return 
     }else{
-      let list = blockInstance.data.list;
-      for(let i=0; i<= list.length-1; i++){
-        let element = [...listDoc].find((f)=> f.getAttribute('id') == list[i].id)
+      let data = blockInstance.data;
+      let copyList = JSON.parse(JSON.stringify(data.list))
+      for(let i=0; i<= copyList.length-1; i++){
+        let element = [...listDoc].find((f)=> f.getAttribute('id') == copyList[i].id)
         if(element){
           if(element.innerHTML){ // 有文本覆盖
-            list[i].text = element.innerHTML;
+            copyList[i].text = element.innerHTML;
           }else{
             // 无文本删除内容
-            list.splice(i,1)
+            copyList.splice(i,1)
             i--
           }
         }else{
-          list.splice(i,1)
+          copyList.splice(i,1)
           i--
         }
       }
+      let listObject = generateListData(blockInstance.data.type)
+      listObject.data.list = copyList;
+      listObject.id = blockInstance.id
+      return listObject
     }
   }
 

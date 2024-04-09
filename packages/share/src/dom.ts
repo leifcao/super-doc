@@ -86,7 +86,9 @@ export const keyCodes = {
   C: 67,
   X: 88,
   V: 86,
-  S: 83
+  S: 83,
+  Z: 90,
+  Y: 89,
 };
 
 export function getElementCoordinates(rect) {

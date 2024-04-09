@@ -87,7 +87,7 @@ export default {
     },
     initData() {
       const { list: _list, type ,} = findBlockDataForId(this.$superConfig.blockId);
-      _list.forEach((item) => {
+      _list.PROXY_TARGET.forEach((item) => {
         item.id = item.id ? item.id : generateId();
         this.focusId = this.focusId ? this.focusId : item.id;
         return item;

@@ -73,10 +73,13 @@ export const copyEventByClipboardCallBack = function (
       copyEventCallBack && copyEventCallBack(that, event, block.target.state);
     });
     // 设置复制文本的内容
-    event.clipboardData?.setData(
-      "text/plain",
-      manager.currentCopyBlockInfo.selectionContent.join('\r\n')
-    );
+    // event.clipboardData?.setData(
+    //   "text/plain",
+    //   manager.currentCopyBlockInfo.selectionContent.join('\r\n')
+    // );
+    navigator.clipboard.writeText(manager.currentCopyBlockInfo.selectionContent.join('\r\n')).then(()=>{
+      console.log('复制成功')
+    })
     event.preventDefault()
   }
 };
@@ -216,6 +219,7 @@ export const getSelectionBlockData = function (
     let selection = window.getSelection();
     let selectedRange = selection.getRangeAt(0);
     let cloneContents = selectedRange.cloneContents();
+    // 构造选中的虚拟dom
     let selectFragment = document.createElement("div");
     selectFragment.appendChild(cloneContents);
     // 默认文本的复制
@@ -223,27 +227,32 @@ export const getSelectionBlockData = function (
     manager.currentSelectionBlockInfo.block = instance;
     manager.currentSelectionBlockInfo.data = [];
     manager.currentSelectionBlockInfo.selectionContent = [];
+    // 选中的文本处理
     if (selectFragment.innerHTML) {
-      // 如何存在选择内容
+      // 查找选中的blockId的内容
       let selectedBlock = selectFragment.querySelectorAll("[block-id]") || [];
+      // 查找选中的子节点，没有blockId，现在使用parentId(待优化)
       let childNode = selectFragment.querySelector("[parent-id]");
       // 检查是否有blockId的模块被选中
-      manager.currentSelectionBlockInfo.content = selectFragment.innerHTML;
+      manager.currentSelectionBlockInfo.content = selectFragment.innerHTML;  // 存一份HTML内容
       if (selectedBlock.length == 0) {
-        manager.currentSelectionBlockInfo.string = selectedRange.toString();
-        manager.currentSelectionBlockInfo.type = "text";
+        manager.currentSelectionBlockInfo.string = selectedRange.toString(); // 存一份string
+        manager.currentSelectionBlockInfo.type = "text"; // 当行选择，仅文本
         manager.currentSelectionBlockInfo.data = instance.instance.compileData(
           instance,
           selectFragment.innerHTML
-        );
-        manager.currentSelectionBlockInfo.selectionContent = [selectedRange.toString()];
-        if (childNode) {
+        ); // 构造文本的blockData
+        // 赋值当前选择的内容id
+        manager.currentSelectionBlockInfo.data[0].id = instance.id
+        manager.currentSelectionBlockInfo.selectionContent = [selectedRange.toString()]; // 选中的文本构建成数组
+        if (childNode) {  // 子节点处理 针对【列表】和【代办】
           manager.currentSelectionBlockInfo.data = [];
           let blockId = childNode.getAttribute("parent-id");
           let blockInstance = manager.blockInstances.find(
             (b) => b.id == blockId
           );
           if (blockInstance) {
+            // 获取对应的block类型的内容回调
             let selectionCallBack = blockInstance.instance.selectionCallBack;
             selectionCallBack &&
               selectionCallBack(that, event, selectFragment, blockInstance);
@@ -258,6 +267,7 @@ export const getSelectionBlockData = function (
             (b) => b.id == blockId
           );
           if (blockInstance) {
+            // 获取对应的block类型的内容回调
             let selectionCallBack = blockInstance.instance.selectionCallBack;
             selectionCallBack &&
               selectionCallBack(that, event, item, blockInstance);
@@ -318,6 +328,8 @@ export async function pasteFile(that: KeyDown, event) {
           desc: "粘贴图",
           url: URL.createObjectURL(blob),
         });
+        imageBlockData.data["file"] = blob
+        imageBlockData.data["upload"] = true
         // 将图片添加到页面中
         manager.replaceCurrentBlock([imageBlockData], focusBlock.id);
         // let url  = manager.config.imageConfig.uploadHost

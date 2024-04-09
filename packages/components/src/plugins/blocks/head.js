@@ -115,16 +115,27 @@ export default class Head extends Plugin.BlockBase {
   copyEventCallBack(context,event, blockInstance){
     console.log(`【superDoc】: 执行复制_head`);
   }
+  /**
+   * 剪切数据，返回最终被剪切后的结果
+   * @param {*} context 文档编辑器上下文
+   * @param {*} event 事件
+   * @param {*} cutData 剪切的数
+   * @param {*} blockInstance block实例
+   * @returns 
+   */
   cutEventCallBack(context,event,cutData, blockInstance){
     let manager = context.Event.Editor.BlockManager;
-
     console.log(`【superDoc】: 执行剪切_head`,cutData,blockInstance);
     let text = blockInstance.element.querySelector("[block-id]").firstChild?.firstChild?.innerHTML || ""
-   if(!text){
-    manager.removeBlock(cutData.id);
-   }else{
-    blockInstance.data.text = text;
-   }
+    if(!text){
+      // manager.removeBlock(cutData.id);
+      return
+    }else{
+      let headObject = generateHeadData(blockInstance.data.level)
+      headObject.data.text = text;
+      headObject.id = blockInstance.id
+      return headObject
+    }
   }
 
   /**

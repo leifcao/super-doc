@@ -313,26 +313,46 @@ export default class Event extends Module {
         if(selection.type !== "None"){
           selectedRange = selection?.getRangeAt(0);
         }
-        if(manager.currentSelectionBlockInfo.data.length!==0 && manager.currentSelectionBlockInfo.type == 'block'){
+        if(manager.currentSelectionBlockInfo.data.length!==0 ){
           if(that.keyDownInstance.isCheckAllStatus()){
-            JSON.parse(JSON.stringify(manager.currentSelectionBlockInfo.data)).forEach((item,index)=>{
-                manager.removeBlock(item.id);
-            })
+            // JSON.parse(JSON.stringify(manager.currentSelectionBlockInfo.data)).forEach((item,index)=>{
+            //     // manager.removeBlock(item.id);
+            //     list.push(item.id)
+            // })
+            // 全部删除，并且追加一个一段落
+            manager.blocks.splice(0,manager.blocks.length,generateParagraphData())
             event.preventDefault()
             return
           }
           // 清除选中内容
           selectedRange && selectedRange.extractContents();
+          let startIndex,endIndex, updateList = [];
           manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
-            let block = manager.findBlockInstanceForId(item.id);
-            // 逻辑是选取的内容中间全部去除。执行剪切事件。 (不严谨暂时处理)
-            if(index == 0 || manager.currentSelectionBlockInfo.data.length - 1 ==index){
-              let cutEventCallBack  = block.target?.state?.instance?.cutEventCallBack
-              cutEventCallBack && cutEventCallBack({Event:that},event,item,block.target.state)
-            }else{
-              manager.removeBlock(item.id);
+            let { target, pre, next} = manager.findBlockInstanceForId(item.id);
+            let cutEventCallBack  = target?.state?.instance?.cutEventCallBack
+            let updateObj = cutEventCallBack && cutEventCallBack({Event:that},event,item,target.state)
+            if(index == 0) {
+              startIndex = target.index;
             }
+            if(manager.currentSelectionBlockInfo.data.length - 1 == index) {
+              endIndex = target.index;
+            }
+            // 通过范围区间去锁定删除内容，并替换新的block
+            updateObj && updateList.push(updateObj)
           })
+          manager.blocks.splice(startIndex,endIndex - startIndex +1,...updateList)
+          // console.log(updateList,'updateListupdateListupdateListupdateList',manager.blocks)
+          // manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
+          //   let block = manager.findBlockInstanceForId(item.id);
+          //   // 逻辑是选取的内容中间全部去除。执行剪切事件。 (不严谨暂时处理)
+          //   if(index == 0 || manager.currentSelectionBlockInfo.data.length - 1 ==index){
+          //     let cutEventCallBack  = block.target?.state?.instance?.cutEventCallBack
+          //     cutEventCallBack && cutEventCallBack({Event:that},event,item,block.target.state)
+          //   }else{
+          //     manager.removeBlock(item.id);
+          //   }
+          // })
+          
           manager.clearSelectionBlockInfo()
           event.preventDefault()
         }else if(manager.currentBlockId && curentFocusBlock.type== "ImageDoc"){
@@ -347,6 +367,14 @@ export default class Event extends Module {
           }
         }
       } 
+      else if((event.metaKey || event.ctrlKey) && event.keyCode === keyCodes.Z){
+        window["TimeMachine"].undoRedoManager.undo()
+        event.preventDefault()
+      }
+      else if((event.metaKey || event.ctrlKey) && event.keyCode === keyCodes.Y){
+        window["TimeMachine"].undoRedoManager.redo()
+        event.preventDefault()
+      }
     }
   }
 

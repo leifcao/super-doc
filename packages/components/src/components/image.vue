@@ -58,8 +58,9 @@ export default {
       // 上传照片不直接走接口
       let url = URL.createObjectURL(event.file);
       this.imagePath = url
-      this.blockData.data.file = event.file;
-      this.blockData.data.upload = true;
+      // 不入执行栈的处理
+      this.blockData.PROXY_TARGET.file = event.file;
+      this.blockData.data.PROXY_TARGET.upload = true;
     },
     imageKeydown(event){
       if(event.keyCode == 8){
@@ -92,7 +93,7 @@ export default {
         }
       },
       set(val) {
-        this.blockData.data.url = val;
+        this.blockData.data.PROXY_TARGET.url = val;
       },
     },
   },

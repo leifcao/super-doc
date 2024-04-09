@@ -169,7 +169,7 @@ export const generateImageData = ({desc, url}) => {
     type: 'ImageDoc',
     data: {
       desc,
-      url
+      url,
     },
     class: 'ImageDoc',
   }

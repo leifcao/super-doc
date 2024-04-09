@@ -19,14 +19,17 @@ export interface ISnapshootUpdate extends ISnapshootBase {
     type: SNAPSHOOT_TYPE.UPDATE,
     old: IOld,
     new: INew,
+    [key: string]:any
 }
 
 export interface ISnapshootDelete extends ISnapshootBase {
     type: SNAPSHOOT_TYPE.DELETE,
     old: IOld,
+    [key: string]:any
 }
 
 export interface ISnapshootAdd extends ISnapshootBase {
     type: SNAPSHOOT_TYPE.ADD,
     new: INew,
+    [key: string]:any
 }

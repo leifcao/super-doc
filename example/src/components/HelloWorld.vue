@@ -533,6 +533,24 @@ export default {
       this.bindPostMessage();
       this.getData();
     }
+    // 
+    //  axios({
+    //     method: "GET",
+    //     url: `/tapd_wikis?workspace_id=60339995`,
+    //     headers: {
+    //       Authorization: `Basic Y3Z3Y1RpOW46OTUyMzZDQUUtRDlBNS1BRTg1LUFBQzctNUE4QTkxMEI5RTY1`,
+    //     },
+    //   }).then((res) => {
+    //     try {
+    //       if (res.status === 200) {
+    //         return res.data?.obj?.result ?? [];
+    //       }
+    //     } catch (error) {
+    //       alert("请求数据失败");
+    //     } finally {
+    //       this.loading = false;
+    //     }
+    //   });
     let self = this
     window.onload = ()=>{
       self.initSuperDoc();
