@@ -84,6 +84,11 @@ export const deepCloneRefreshId = function(object:Object | [],refreshKey:string[
         return object;
     }
 
+    // 不刷新文件类型的内容
+    if(Object.prototype.toString.call(object) == '[object File]'){
+        return object;
+    }
+
     // 如果已经拷贝过了该对象，直接返回它的拷贝
     if (hash.has(object)) {
         return hash.get(object);

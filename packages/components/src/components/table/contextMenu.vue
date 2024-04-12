@@ -1,7 +1,11 @@
 <template>
   <div class="table-context-menu" v-show="contextMenuDisplay">
     <ul>
-      <li v-for="item in list" :key="item.operation" @click="$emit('contextClick', item)">
+      <li
+        v-for="item in contextList"
+        :key="item.operation"
+        @click="$emit('contextClick', item)"
+      >
         {{ item.label }}
       </li>
     </ul>
@@ -9,13 +13,21 @@
 </template>
 
 <script>
+import contextMenu from './contextMenu'
 export default {
   name: "",
-  props: ["list"],
+  props: ["type"],
   data() {
     return {
-        contextMenuDisplay:false,
+      contextMenuDisplay: false,
+      contextList: contextMenu.head
     };
+  },
+  watch: {
+    type(newVal, oldVal) {
+      this.contextList = newVal == "head" ? contextMenu.head : contextMenu.row;
+      console.log(newVal, oldVal, "新旧类型");
+    },
   },
 };
 </script>

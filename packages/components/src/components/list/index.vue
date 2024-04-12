@@ -59,7 +59,7 @@ export default {
     },
     removeHandler(id) {
       const index = this.list.findIndex(item => item.id === id);
-      this.list.PROXY_TARGET.splice(index, 1);
+      this.list.splice(index, 1);
       const selection = window.getSelection();
       if(this.list.length == 0){
         // 空数据替换成p标签内容
@@ -72,17 +72,17 @@ export default {
         let preListItem = this.list[preIndex]
         let preListDom = document.querySelector(`[id="${preListItem?.id}"]`)
         if(preListDom){
-           preListDom.focus()
           if (preListItem.text.length > 0) {
             let range = document.createRange();
-            range.setStart(preListDom.firstChild,preListItem.text.length)
-            range.setEnd(preListDom.firstChild,preListItem.text.length)
-            range.collapse(true);
+            range.selectNodeContents(preListDom.lastChild)
+            // range.setStart(preListDom.firstChild,preListItem.text.length)
+            // range.setEnd(preListDom.firstChild,preListItem.text.length)
+            range.collapse(false);
             selection.removeAllRanges();
             selection.addRange(range);
          }
+           preListDom.focus()
         }
-        console.log('lfjs:removeHandler')
       }
     },
     initData() {

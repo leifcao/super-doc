@@ -23,6 +23,7 @@ export class BlockBase {
       Vue.prototype['$replaceCurrentBlock'] = (...args) => this._config.Editor.API.replaceCurrentBlock(...args);
       Vue.prototype['$superDocUpdateBlockData'] = (...args) => this._config.Editor.API.superDocUpdateBlockData(...args);
       Vue.prototype['$superDocListen'] = (...args) => this._config.Editor.API.superDocListen(...args);
+      Vue.prototype['$blockManager'] = () => this._config.Editor.UI.Editor.BlockManager
   }
 
   // 子类生产的dom进行最后的包装

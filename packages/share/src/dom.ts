@@ -108,10 +108,11 @@ export function getElementCoordinates(rect) {
 }
 
 // 
-export function getElementCoordinatesByHolder(hodler,rect) {
+export function getElementCoordinatesByHolder(hodler,element) {
   const scrollX = hodler.scrollLeft ||  window.scrollX || window.pageXOffset;
   const scrollY = hodler.scrollTop ||  window.scrollY || window.pageYOffset;
   let hodlerRect = hodler.getBoundingClientRect();
+  let rect = element.getBoundingClientRect()
   const docX = rect.left + scrollX;
   const docY = rect.top + scrollY;
 

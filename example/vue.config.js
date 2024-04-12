@@ -7,12 +7,12 @@ module.exports = {
           pathRewrite: {
           },
         },
-        '/akb': {
-          target: 'http://10.8.4.148:9898',
-          changeOrigin: true,
-          pathRewrite: {
-          },
-        },
+        // '/akb': {
+        //   target: 'http://10.8.4.148:9898',
+        //   changeOrigin: true,
+        //   pathRewrite: {
+        //   },
+        // },
         '/tapd_wikis': {
           target: 'https://api.tapd.cn',
           changeOrigin: true,

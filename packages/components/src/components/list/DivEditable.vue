@@ -1,5 +1,5 @@
 <template>
-  <div class="super-list-container" :parent-id="blockId">
+  <div class="super-list-container" :parent-id="blockId" data-select="true">
     <div class="super-list-icon" contenteditable="false" >{{ type }}</div>
     <div
       contenteditable
@@ -43,8 +43,10 @@ export default {
         console.log('【superDoc】list删除')
         if(!this.listData.text){
           this.$emit('remove', this.listData.id);
+          event.preventDefault()
         }
         // 阻止冒泡
+        if(this.$blockManager().curentFocusBlock.CURRENT_CHECKOUT_COUNT !== 3)
         event.stopImmediatePropagation();
       }
     },
@@ -78,6 +80,10 @@ export default {
   > .super-list-icon {
     margin-right: 10px;
     font-weight: 600;
+     line-height: 22px;
+  }
+  > .super-list-content{
+    line-height: 22px;
   }
 }
 </style>

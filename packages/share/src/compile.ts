@@ -41,3 +41,15 @@ export const compileTodoData = (list:any[]) =>{
     })
     return toDoData;
 }
+
+
+export const genearteTableData = ({title,table}) =>{
+    return {
+      class: "TableDoc",
+      type: "TableDoc",
+      data:{
+        title,
+        table: table.map(t=> {!t.__id__ && (t.__id__ = generateBlockId()); return t})
+      }
+    }
+  }

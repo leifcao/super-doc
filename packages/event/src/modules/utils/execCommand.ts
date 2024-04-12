@@ -52,12 +52,14 @@ export const copyEventByClipboardCallBack = function (
     event.clipboardData?.setData(
       "text/plain",
       manager.currentSelectionBlockInfo.string
+      // manager.currentSelectionBlockInfo.selectionContent.join('\r\n')
     );
     // 解析文本类型的block
-    manager.currentCopyBlockInfo.data = instance.instance.compileData(
-      instance,
-      manager.currentSelectionBlockInfo.content
-    );
+    // manager.currentCopyBlockInfo.data = instance.instance.compileData(
+    //   instance,
+    //   manager.currentSelectionBlockInfo.content
+    // );
+    manager.currentCopyBlockInfo.data = manager.currentSelectionBlockInfo.data;
     // 文本类型，代表单行复制。所以阻止默认的复制事件
     event.preventDefault();
   } else {
@@ -171,10 +173,11 @@ export const cutEventByClipboardCallBack = function (
         manager.currentSelectionBlockInfo.string
       );
       // 解析文本类型的block TODO：instance 改成工具栏获取
-      manager.currentCopyBlockInfo.data = instance.instance.compileData(
-        instance,
-        manager.currentSelectionBlockInfo.content
-      );
+      // manager.currentCopyBlockInfo.data = instance.instance.compileData(
+      //   instance,
+      //   manager.currentSelectionBlockInfo.content
+      // );
+      manager.currentCopyBlockInfo.data = manager.currentSelectionBlockInfo.data;
       let extractContents = selectedRange.extractContents();
       console.log("lfjs：剪切事件");
       event.preventDefault()
@@ -185,6 +188,7 @@ export const cutEventByClipboardCallBack = function (
         ["id"]
       );
       manager.currentCopyBlockInfo.data = refreshBlockData;
+      manager.currentCopyBlockInfo.selectionContent = manager.currentSelectionBlockInfo.selectionContent;
       // 清除选中内容
       let extractContents = selectedRange.extractContents();
       manager.currentSelectionBlockInfo.data.forEach((item, index) => {
@@ -201,6 +205,9 @@ export const cutEventByClipboardCallBack = function (
           manager.removeBlock(item.id);
         }
       });
+      navigator.clipboard.writeText(manager.currentCopyBlockInfo.selectionContent.join('\r\n')).then(()=>{
+        console.log('剪切成功')
+      })
       event.preventDefault();
     }
   } catch (e) {
@@ -232,31 +239,25 @@ export const getSelectionBlockData = function (
       // 查找选中的blockId的内容
       let selectedBlock = selectFragment.querySelectorAll("[block-id]") || [];
       // 查找选中的子节点，没有blockId，现在使用parentId(待优化)
-      let childNode = selectFragment.querySelector("[parent-id]");
+      // let childNode = selectFragment.querySelector("[parent-id]");
+      let childNode = selectFragment.querySelector("[data-select]");
       // 检查是否有blockId的模块被选中
       manager.currentSelectionBlockInfo.content = selectFragment.innerHTML;  // 存一份HTML内容
       if (selectedBlock.length == 0) {
         manager.currentSelectionBlockInfo.string = selectedRange.toString(); // 存一份string
         manager.currentSelectionBlockInfo.type = "text"; // 当行选择，仅文本
-        manager.currentSelectionBlockInfo.data = instance.instance.compileData(
-          instance,
-          selectFragment.innerHTML
-        ); // 构造文本的blockData
-        // 赋值当前选择的内容id
-        manager.currentSelectionBlockInfo.data[0].id = instance.id
-        manager.currentSelectionBlockInfo.selectionContent = [selectedRange.toString()]; // 选中的文本构建成数组
+        instance.instance.selectionCallBack?.(that, event, selectFragment, instance , "text")
         if (childNode) {  // 子节点处理 针对【列表】和【代办】
           manager.currentSelectionBlockInfo.data = [];
-          let blockId = childNode.getAttribute("parent-id");
+          manager.currentSelectionBlockInfo.selectionContent = [];
+          let blockId = childNode.getAttribute("parent-id") || manager.currentBlockId;
           let blockInstance = manager.blockInstances.find(
             (b) => b.id == blockId
           );
           if (blockInstance) {
             // 获取对应的block类型的内容回调
-            let selectionCallBack = blockInstance.instance.selectionCallBack;
-            selectionCallBack &&
-              selectionCallBack(that, event, selectFragment, blockInstance);
             manager.currentSelectionBlockInfo.type = "block";
+            blockInstance.instance.selectionCallBack?.(that, event, selectFragment, blockInstance, "block")
           }
         }
       } else {
@@ -268,9 +269,7 @@ export const getSelectionBlockData = function (
           );
           if (blockInstance) {
             // 获取对应的block类型的内容回调
-            let selectionCallBack = blockInstance.instance.selectionCallBack;
-            selectionCallBack &&
-              selectionCallBack(that, event, item, blockInstance);
+            blockInstance.instance.selectionCallBack?.(that, event, item, blockInstance,"block");
           }
         });
       }

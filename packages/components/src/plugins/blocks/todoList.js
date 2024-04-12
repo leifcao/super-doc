@@ -19,13 +19,6 @@ export default class TodoList extends Plugin.BlockBase {
   }
    copyEventCallBack(context,event,blockInstance){
     console.log(`【superDoc】: 执行复制_TodoList`);
-    // let manager = context.Event["Editor"].BlockManager
-    // let todoArr = copyDom.querySelectorAll("[id]")
-    // let todoObject = generateTodoData()
-    // todoArr.forEach((item)=>{
-    //   todoObject.data.list.push({id: _.generateBlockId(),task:item.innerHTML})
-    // })
-    // manager.currentCopyBlockInfo.data.push(listObject)
   }
 
 
@@ -53,17 +46,27 @@ export default class TodoList extends Plugin.BlockBase {
     return [_.compileTodoData([{task:text,finish:false}])]
   }
 
-  selectionCallBack(context,event,copyDom, blockInstance){
-    console.log(`【superDoc】: 执行复制_TodoList`);
-    let manager = context.Editor.BlockManager
-    let todoArr = copyDom.querySelectorAll("[id]")
-    let todoObject = generateTodoData()
-    todoArr.forEach((item)=>{
-      // _.generateBlockId()
-      todoObject.data.list.push({id: item.getAttribute("id"),task:item.innerHTML})
-    })
-    todoObject.id = blockInstance.id
-
-    manager.currentSelectionBlockInfo.data.push(listObject)
+  selectionCallBack(context,event,selectionDom, currentInstance, type = "text"){
+   try{
+      console.log(`【superDoc】: 执行选择_TodoList`);
+      let manager = context.Editor.BlockManager;
+      let todoObject = generateTodoData()
+      if(type == "text") {
+        todoObject.data.list.push({task:selectionDom.innerHTML, id: _.generateBlockId(), finish:false})
+        manager.currentSelectionBlockInfo.selectionContent.push(selectionDom.innerHTML);
+      }else{
+        let todoArr = selectionDom.querySelectorAll("[task-id]")
+        todoArr.forEach((item)=>{
+          let finish = item.querySelector("label")?.className.includes("is-checked") ? true : false
+          let task = item.querySelector('[id]')?.innerHTML || ""
+          todoObject.data.list.push({id: item.getAttribute("task-id"),task ,finish })
+          manager.currentSelectionBlockInfo.selectionContent.push(task);
+        })
+      }
+      todoObject.id = currentInstance.id
+      manager.currentSelectionBlockInfo.data.push(todoObject)
+   }catch(e){
+    console.error(`【superDoc】: 执行选择_TodoList失败`,e);
+   }
   }
 }

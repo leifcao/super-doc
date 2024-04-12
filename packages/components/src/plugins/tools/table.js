@@ -139,4 +139,66 @@ export default class TableTool extends Plugin.ToolPluginBase {
     div.textContent = "表格";
     return div;
   }
+
+  genearteTableData({title,table}){
+    return {
+      class: this.type,
+      type: this.type,
+      data:{
+        title,
+        table: table.map(t=> {!t.__id__ && (t.__id__ = _.generateBlockId()); return t})
+      }
+    }
+  }
+  formatHeadKey(content){
+   return content.split(".")[1].replace("}", "")
+  }
+  // str解析成blockData
+  complieHTMLToBlockData(node,blockData){
+    if(typeof node.innerHTML !== "undefined") {
+      // 为了能够每个元素都能编辑，遍历元素追加内容
+      let table = node.querySelector("table")
+      let id = table.id
+      let thead = table.querySelectorAll("thead th");
+      let tbody = table.querySelectorAll("tbody tr");
+      // 构建表头
+      let titleArr = [...thead].reduce((arr, item)=>{
+        arr.push({
+          title:item.innerHTML,
+          value:item.getAttribute("value")
+        })
+        return arr
+      },[]);
+      // 构建表体
+      let tableArr = [...tbody].reduce((arr, item) =>{
+        let tdObject = { __id__: item.id }
+        item.childNodes.forEach((c=>{
+          let key = c.getAttribute("key");
+          tdObject[key] = c.innerHTML;
+        }))
+        arr.push(tdObject)
+        return arr
+      },[])
+      let tableData = this.genearteTableData({title:titleArr, table: tableArr})
+      tableData.id = id || _.generateBlockId();
+      blockData.push(tableData)
+    }
+  }
+
+  // 反解析成htmlstring
+  deComplieBlockDataToHTML(block){
+    // 表头key
+    let keyList = [];
+    let head = block.data.title.map((item)=>{
+      keyList.push(this.formatHeadKey(item.value))
+      return `<th value="${item.value}">${item.title}</th>`
+    }).join('\r\n');
+    let body = block.data.table.map(item=>{
+      let tdList = keyList.map((key)=>{
+        return `<td key="${key}">${item[key]}</td>`
+      })
+      return `<tr id="${item.__id__ || _.generateBlockId()}">${tdList}</tr>`
+    }).join('\r\n')
+    return `<div block-type="${this.type}"><table id="${block.id}"><thead><tr align="left">${head}</tr></thead><tbody>${body}</tbody></table></div>`
+  }
 }

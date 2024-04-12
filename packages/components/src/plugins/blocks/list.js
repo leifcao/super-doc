@@ -21,7 +21,7 @@ export default class ListDoc extends Plugin.BlockBase {
   copyEventCallBack(context,event,blockInstance){
     console.log(`【superDoc】: 执行复制_ListDoc`);
     // let manager = context.Event["Editor"].BlockManager
-    // let listDocArr = copyDom.querySelectorAll("[id]")
+    // let listDocArr = selectionDom.querySelectorAll("[id]")
     // let listObject = generateListData(blockInstance.data.type)
     // listDocArr.forEach((item)=>{
     //   listObject.data.list.push({id: _.generateBlockId(),text:item.innerHTML})
@@ -101,17 +101,26 @@ export default class ListDoc extends Plugin.BlockBase {
     return [_.compileListData([{text}],blockInstance.data.type)]
   }
 
-  selectionCallBack(context,event,copyDom, blockInstance){
-    console.log(`【superDoc】: 执行选中回调_ListDoc`);
-    let manager = context.Editor.BlockManager
-    let listDocArr = copyDom.querySelectorAll("[id]")
-    let listObject = generateListData(blockInstance.data.type)
-    listDocArr.forEach((item)=>{
-      // _.generateBlockId()
-      listObject.data.list.push({id: item.getAttribute('id'),text:item.innerHTML})
-      manager.currentSelectionBlockInfo.selectionContent.push(item.innerHTML);
-    })
-    listObject.id = blockInstance.id;
-    manager.currentSelectionBlockInfo.data.push(listObject)
+  selectionCallBack(context,event,selectionDom, currentInstance, type = "text"){
+    try{
+      console.log(`【superDoc】: 执行选中回调_ListDoc`);
+      let manager = context.Editor.BlockManager;
+      let listType = currentInstance.data.type
+      let listObject = generateListData(listType)
+      if(type == "text") {
+        listObject.data.list.push({text:selectionDom.innerHTML, id: _.generateBlockId()})
+        manager.currentSelectionBlockInfo.selectionContent.push(selectionDom.innerHTML);
+      }else{
+        let listDocArr = selectionDom.querySelectorAll("[id]")
+        listDocArr.forEach((item)=>{
+          listObject.data.list.push({id: item.getAttribute('id'),text:item.innerHTML})
+          manager.currentSelectionBlockInfo.selectionContent.push(item.innerHTML);
+        })
+      }
+      listObject.id = currentInstance.id;
+      manager.currentSelectionBlockInfo.data.push(listObject)
+    }catch(e){
+      console.log(`【superDoc】: 执行选中回调_ListDoc失败`, e);
+    }
   }
 }

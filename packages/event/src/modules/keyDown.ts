@@ -1,5 +1,5 @@
 import { BlockInstance, OutputBlockData, CURSOR_DIRECTION} from "@super-doc/types";
-import { Dom as $, compileParagraph,deepCloneRefreshId } from "@super-doc/share";
+import { Dom as $, compileParagraph,deepCloneRefreshId ,isString,isDOM} from "@super-doc/share";
 
 import {
   getBlockIdForElement,
@@ -8,6 +8,7 @@ import {
   getParagraphElements,
   isCursorAtFirstOrLastLine,
   keyCodes,
+  getElementCoordinatesByHolder
 } from "@super-doc/share";
 import Event from "../index";
 import { copyEventByClipboardCallBack, copyEventByKeyBoardCallBack, cutEventByClipboardCallBack, pasteEventByClipboardCallBack, pasteEventByKeyBoardCallBack } from "./utils/execCommand";
@@ -134,7 +135,7 @@ export default class KeyDown {
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
     const { left: x } = getElementCoordinates(range.getBoundingClientRect());
-    this.setCursorForX(focusEl, x);
+    // this.setCursorForX(focusEl, x);
 
     // TODO: 解决多个paragraph属于同一个block下导致焦点切换出错问题
     if (!currentTarget.contains(focusEl)) {
@@ -146,6 +147,8 @@ export default class KeyDown {
         this.Event["Editor"].BlockManager.changeCurrentBlockId(next.state.id);
       }
     }
+    this.setCursorForX(focusEl, x);
+
   }
 
   /**
@@ -271,4 +274,4 @@ export default class KeyDown {
     return curentFocusBlock.CURRENT_CHECKOUT_COUNT  == curentFocusBlock.CHECKOUT_BLOCK_NUMBER
   }
   
-}
+  }

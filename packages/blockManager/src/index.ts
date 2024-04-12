@@ -1,4 +1,4 @@
-import { Module, Dom as $, getElementCoordinates } from "@super-doc/share";
+import { Module, Dom as $, getElementCoordinates,isString,isDOM,  getElementCoordinatesByHolder } from "@super-doc/share";
 import TimeMachine from "@super-doc/time-machine";
 import {
   OutputBlockData,
@@ -88,7 +88,7 @@ export default class BlockManager extends Module {
           const selection = window.getSelection();
           const range = selection.getRangeAt(0);
           const { left: x } = getElementCoordinates(range.getBoundingClientRect());
-          this.Editor.Event.keyDownInstance.setCursorForX(paragraphEl, x === 0 ? 1000 : x);
+          // this.Editor.Event.keyDownInstance.setCursorForX(paragraphEl, x === 0 ? 1000 : x);
         } catch (error) {
           this.Editor.Event.keyDownInstance.setCursorForX(paragraphEl, 0);
         }
@@ -176,6 +176,7 @@ export default class BlockManager extends Module {
             blockInstances.forEach((item) => {
               this.syncRendered(item)
               this.changeCurrentBlockId(item.id);
+              this.setFoucsCursor()
             });
             this.Editor.Event.addListeners.forEach(callback => callback(blocks, this.blocks));
           } catch (error) {
@@ -206,6 +207,8 @@ export default class BlockManager extends Module {
     
             this.currentHoverBlockId = preId || id;
             this.currentBlockId = preId || id;
+            this.setFoucsCursor()
+
             this.Editor.Renderer.reredner();
             this.Editor.Event.deleteListeners.forEach(callback => callback(blocks, this.blocks));
           } catch (error) {
@@ -419,6 +422,47 @@ export default class BlockManager extends Module {
     }
   }
 
+  // 设置光标
+  public setFoucsCursor(){
+    if(document.activeElement !== $.querySelector(`[block-id="${this._currentBlockId}"]`)) {
+      const blockElement = $.querySelector(`[block-id="${this._currentBlockId}"]`);
+      let contenteditableElement = blockElement.querySelectorAll('[contenteditable="true"]') as NodeList
+      if(contenteditableElement) {
+        try {
+          const selection = window.getSelection();
+          const selectionRange = selection.getRangeAt(0);
+          const { left: x } = this.getElementCoordinatesByHolder(selectionRange);
+          let range = document.createRange();
+            // 聚焦到末尾
+            let lasteditableBlock = contenteditableElement[contenteditableElement.length - 1] as HTMLElement;
+            if(!lasteditableBlock) return;
+            if(!lasteditableBlock.lastChild) lasteditableBlock.focus()
+            else{
+              let child = lasteditableBlock.lastChild;
+              while(child.lastChild){ child = child.lastChild }
+              range.selectNodeContents(child)
+              range.collapse(false);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+        } catch (error) {
+          console.error('【superDoc】光标定位错误', error)
+        }
+      } 
+    }
+  }
 
+  public getElementCoordinatesByHolder(element){
+    let holder
+    if (isString(this.config.holder)) {
+      holder =  $.querySelector(this.config.holder as string)
+    } else if (isDOM(this.config.holder)) {
+      holder = this.config.holder
+    }
+    this.getElementCoordinatesByHolder = (element) =>{
+      return getElementCoordinatesByHolder(holder,element)
+    }
 
+    return this.getElementCoordinatesByHolder(element)
+  }
 }

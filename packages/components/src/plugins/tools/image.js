@@ -33,7 +33,7 @@ export default class ImageTool extends Plugin.ToolPluginBase {
     }
 
     deComplieBlockDataToHTML(block){
-      return `<div class="">\r\n <img alt="${block.data.desc}" src="${block.data.url}" />\r\n </div>`
+      return `<div class="" block-type="${this.type}" id="${block.id}">\r\n <img alt="${block.data.desc}" src="${block.data.url}" />\r\n </div>`
     }
 
     checkMdToolType(str){

@@ -196,19 +196,22 @@ export default class Head extends Plugin.BlockBase {
    * 标题栏选中事件回调
    * @param {*} context 文档编辑器上下文
    * @param {*} event 
-   * @param {*} copyDom 
-   * @param {*} blockInstance 
+   * @param {*} selectionDom 选中的dom
+   * @param {*} blockInstance 当前选中block的实例
    */
-  selectionCallBack(context,event,copyDom, blockInstance){
-    console.log(`【superDoc】: 执行选择_head`);
-    let manager = context.Editor.BlockManager
-    let text = copyDom.querySelector("#superdoc-paragraph").innerHTML
-    let headObject = generateHeadData(blockInstance.data.level)
-    headObject.data.text = text;
-    // 当前选中节点的id赋值
-    headObject.id = blockInstance.id;
-    manager.currentSelectionBlockInfo.data.push(headObject)
+  selectionCallBack(context,event,selectionDom, currentInstance, type = "text"){
+   try{
+    console.log(`【superDoc】: 执行选中回调_head`);
+    let manager = context.Editor.BlockManager;
+    let text = type == "text" ? selectionDom.innerHTML : selectionDom.querySelector("#superdoc-paragraph").innerHTML
+    const headObject = generateHeadData(currentInstance.data.level);
+    headObject.id = currentInstance.id; // 赋值当前选中的文本的block实例id
+    headObject.data.text = text; // 选中文本的赋值
+    manager.currentSelectionBlockInfo.data.push(headObject); // 记录选中的blockData
     // 构建选中的文本内容
-    manager.currentSelectionBlockInfo.selectionContent.push(text);
+    manager.currentSelectionBlockInfo.selectionContent.push(text); // 记录选中的文本
+   }catch(e){
+    console.error(`【superDoc】: 执行选中回调_head失败`,e);
+   }
   }
 }

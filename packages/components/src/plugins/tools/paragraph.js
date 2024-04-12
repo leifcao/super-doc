@@ -33,7 +33,7 @@ export class ParagraphTool extends Plugin.ToolPluginBase {
 
     // 反解析成htmlstring
     deComplieBlockDataToHTML(block){
-      return  `<p>${block.data.text}</p>`
+      return  `<p block-type="${block.type}" id="${block.id}">${block.data.text}</p>`
     }
 
     // md默认转换为blockData

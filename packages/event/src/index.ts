@@ -127,7 +127,7 @@ export default class Event extends Module {
   public mouseEvent(blocks) {
     blocks.forEach((block) => {
       block.element.addEventListener("click", this.mouseClick.bind(this));
-      block.element.addEventListener("input", this.inputEvent.bind(this));
+      // block.element.addEventListener("input", this.inputEvent.bind(this));
       // block.element.addEventListener("mouseout", this.onmouseout.bind(this));
       block.element.addEventListener(
         "mouseover",
@@ -187,27 +187,25 @@ export default class Event extends Module {
     }
     if (this.Editor.UI.command.visible || this.Editor.UI.layout.visible) return;
     if (blockId) {
-      // 这里不应该用window作为依据
-      // let {
-      //   left: x,
-      //   top: y,
-      //   rect,
-      // } = getElementCoordinates(target.getBoundingClientRect());
-      let holder
-      if (isString(this.config.holder)) {
-        holder =  $.querySelector(this.config.holder as string)
-      } else if (isDOM(this.config.holder)) {
-        holder = this.config.holder
-      }
-      let rect = target.getBoundingClientRect()
-      let hodlerRect = holder.getBoundingClientRect();
-      toolbar.style = !!toolbar.style ? toolbar.style : {};
-      toolbar.style.left = rect.left - hodlerRect.left - 60 + "px";
-      toolbar.style.top = rect.top - hodlerRect.top + 3 + "px";
-
-      event.stopPropagation();
-      toolbar.classList.add(this.Editor.UI.CSS.superDocToolbarOpen);
       this.Editor.BlockManager.currentHoverBlockId = blockId;
+      event.stopPropagation();
+      return;
+      // 取消跟随鼠标移动的工具栏
+      // let holder
+      // if (isString(this.config.holder)) {
+      //   holder =  $.querySelector(this.config.holder as string)
+      // } else if (isDOM(this.config.holder)) {
+      //   holder = this.config.holder
+      // }
+      // let rect = target.getBoundingClientRect()
+      // let hodlerRect = holder.getBoundingClientRect();
+      // toolbar.style = !!toolbar.style ? toolbar.style : {};
+      // toolbar.style.left = rect.left - hodlerRect.left - 60 + "px";
+      // toolbar.style.top = rect.top - hodlerRect.top + 3 + "px";
+
+      // event.stopPropagation();
+      // toolbar.classList.add(this.Editor.UI.CSS.superDocToolbarOpen);
+      // this.Editor.BlockManager.currentHoverBlockId = blockId;
     }
   }
 
@@ -234,7 +232,7 @@ export default class Event extends Module {
       (event:any) => {
         if(window.getSelection().isCollapsed){
           event.target.focus();
-          console.log('focus')
+          // console.log('focus')
           this.Editor.BlockManager.clearSelectionBlockInfo();
         }
         if (event.target !== editorZoneElement) return;
@@ -246,7 +244,7 @@ export default class Event extends Module {
         ) {
           this.Editor.BlockManager.blocks.push(generateParagraphData());
         } else {
-          console.log(this.Editor.BlockManager.blocks.slice(-1)[0].id);
+          // console.log(this.Editor.BlockManager.blocks.slice(-1)[0].id);
           this.Editor.BlockManager.changeCurrentBlockId(
             this.Editor.BlockManager.blocks.slice(-1)[0].id
           );
@@ -308,64 +306,7 @@ export default class Event extends Module {
     if(!editorZoneElement) return;
     if(editorZoneElement.contains(event.target) || editorZoneElement.contains(selection.focusNode)){
       if (event.keyCode === keyCodes.BACKSPACE) {
-        console.log("lfjs:全局删除")
-        let selectedRange 
-        if(selection.type !== "None"){
-          selectedRange = selection?.getRangeAt(0);
-        }
-        if(manager.currentSelectionBlockInfo.data.length!==0 ){
-          if(that.keyDownInstance.isCheckAllStatus()){
-            // JSON.parse(JSON.stringify(manager.currentSelectionBlockInfo.data)).forEach((item,index)=>{
-            //     // manager.removeBlock(item.id);
-            //     list.push(item.id)
-            // })
-            // 全部删除，并且追加一个一段落
-            manager.blocks.splice(0,manager.blocks.length,generateParagraphData())
-            event.preventDefault()
-            return
-          }
-          // 清除选中内容
-          selectedRange && selectedRange.extractContents();
-          let startIndex,endIndex, updateList = [];
-          manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
-            let { target, pre, next} = manager.findBlockInstanceForId(item.id);
-            let cutEventCallBack  = target?.state?.instance?.cutEventCallBack
-            let updateObj = cutEventCallBack && cutEventCallBack({Event:that},event,item,target.state)
-            if(index == 0) {
-              startIndex = target.index;
-            }
-            if(manager.currentSelectionBlockInfo.data.length - 1 == index) {
-              endIndex = target.index;
-            }
-            // 通过范围区间去锁定删除内容，并替换新的block
-            updateObj && updateList.push(updateObj)
-          })
-          manager.blocks.splice(startIndex,endIndex - startIndex +1,...updateList)
-          // console.log(updateList,'updateListupdateListupdateListupdateList',manager.blocks)
-          // manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
-          //   let block = manager.findBlockInstanceForId(item.id);
-          //   // 逻辑是选取的内容中间全部去除。执行剪切事件。 (不严谨暂时处理)
-          //   if(index == 0 || manager.currentSelectionBlockInfo.data.length - 1 ==index){
-          //     let cutEventCallBack  = block.target?.state?.instance?.cutEventCallBack
-          //     cutEventCallBack && cutEventCallBack({Event:that},event,item,block.target.state)
-          //   }else{
-          //     manager.removeBlock(item.id);
-          //   }
-          // })
-          
-          manager.clearSelectionBlockInfo()
-          event.preventDefault()
-        }else if(manager.currentBlockId && curentFocusBlock.type== "ImageDoc"){
-          // 删除图片
-          manager.removeBlock(manager.currentBlockId);
-        }else if(manager.currentSelectionBlockInfo.type == 'text'){
-          selectedRange && selectedRange.extractContents();
-          if(event.target.childNodes.length == 0){
-            manager.removeBlock(manager.curentFocusBlock.id);
-          }else if(event.target.childNodes.length == 1 && event.target.childNodes[0].tagName == "BR"){
-            manager.removeBlock(manager.curentFocusBlock.id);
-          }
-        }
+        this.backspaceEvent(event)
       } 
       else if((event.metaKey || event.ctrlKey) && event.keyCode === keyCodes.Z){
         window["TimeMachine"].undoRedoManager.undo()
@@ -404,5 +345,52 @@ export default class Event extends Module {
     }
   }
    
+  public backspaceEvent(event){
+    console.log("【siperDoc-backspace】:全局删除")
+    let selection = window.getSelection();
+    let selectedRange 
+    let manager = this.Editor.BlockManager;
+    let curentFocusBlock = manager.curentFocusBlock;
+    let  that = this;
+    if(selection.type !== "None"){
+      selectedRange = selection?.getRangeAt(0);
+    }
+    if(manager.currentSelectionBlockInfo.data.length!==0 ){
+      if(that.keyDownInstance.isCheckAllStatus()){
+        // 全部删除，并且追加一个一段落
+        manager.blocks.splice(0,manager.blocks.length,generateParagraphData())
+        event.preventDefault()
+        return
+      }
+      // 清除选中内容
+      selectedRange && selectedRange.extractContents();
+      let startIndex,endIndex, updateList = [];
+      let length = manager.currentSelectionBlockInfo.data.length - 1
+      manager.currentSelectionBlockInfo.data.forEach((item,index)=>{
+        let { target, pre, next} = manager.findBlockInstanceForId(item.id);
+        let updateObj;
+          index == 0 && (startIndex = target.index);
+          length == index && (endIndex = target.index);
+          if (index == 0 || length == index){
+            updateObj = target?.state?.instance?.cutEventCallBack?.({Event:that},event,item,target.state)
+          }
+        // 通过范围区间去锁定删除内容，并替换新的block
+        updateObj && updateList.push(updateObj)
+      })
+      manager.blocks.splice(startIndex,endIndex - startIndex + 1,...updateList)
+      manager.clearSelectionBlockInfo()
+      event.preventDefault()
+    }else if(manager.currentBlockId && curentFocusBlock.type== "ImageDoc"){
+      // 删除图片
+      manager.removeBlock(manager.currentBlockId);
+    }else if(manager.currentSelectionBlockInfo.type == 'text'){
+      selectedRange && selectedRange.extractContents();
+      if(event.target.childNodes.length == 0){
+        manager.removeBlock(manager.curentFocusBlock.id);
+      }else if(event.target.childNodes.length == 1 && event.target.childNodes[0].tagName == "BR"){
+        manager.removeBlock(manager.curentFocusBlock.id);
+      }
+    }
+  }
 }
 

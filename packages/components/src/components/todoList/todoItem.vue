@@ -1,5 +1,5 @@
 <template>
-  <div class="super-doc-todo-option-container" :parent-id="blockId" :task-id="todo.id" :class="[foucsFlag?'foucs-style':'']" @keydown="enterKeydownHandler">
+  <div class="super-doc-todo-option-container" :parent-id="blockId" :task-id="todo.id" :class="[foucsFlag?'foucs-style':'']" data-select="true" @keydown="enterKeydownHandler">
     <el-checkbox class="icon" size="small" v-model="todo.finish"></el-checkbox>
     <SuperDocInput
       style="width: calc(650px - 24px);"
@@ -45,6 +45,15 @@ export default {
         this.$emit("add", this.todo.id);
       } else if (event.keyCode === 13 && !this.todo.task) {
         this.$emit("remove", this.todo.id);
+      }else if(event.keyCode == 8){
+        console.log('【superDoc】todoList删除')
+         if(!this.todo.task){
+           this.$emit('remove', this.todo.id);
+           event.preventDefault()
+         }
+         // 阻止冒泡
+        if(this.$blockManager().curentFocusBlock.CURRENT_CHECKOUT_COUNT !== 3)
+          event.stopImmediatePropagation();
       }
     },
     focusChange(flag){

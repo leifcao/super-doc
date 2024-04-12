@@ -24,6 +24,8 @@
     "@super-doc/event": "workspace:^1.0.0",
     "@super-doc/share": "workspace:^1.0.0",
     "@super-doc/types": "workspace:^1.0.0",
-    "@super-doc/ui": "workspace:^1.0.0"
+    "@super-doc/ui": "workspace:^1.0.0",
+    "@super-doc/command-manager": "workspace:^1.0.0",
+    "@super-doc/time-machine": "workspace:^1.0.0"
   }
 }

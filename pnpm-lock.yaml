@@ -72,12 +72,18 @@ importers:
       '@super-doc/block-manager':
         specifier: workspace:^1.0.0
         version: link:../blockManager
+      '@super-doc/command-manager':
+        specifier: workspace:^1.0.0
+        version: link:../commandManager
       '@super-doc/event':
         specifier: workspace:^1.0.0
         version: link:../event
       '@super-doc/share':
         specifier: workspace:^1.0.0
         version: link:../share
+      '@super-doc/time-machine':
+        specifier: workspace:^1.0.0
+        version: link:../timeMachine
       '@super-doc/types':
         specifier: workspace:^1.0.0
         version: link:../types

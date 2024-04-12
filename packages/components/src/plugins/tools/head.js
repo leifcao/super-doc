@@ -34,7 +34,7 @@ export class HeadTool1 extends Plugin.ToolPluginBase {
     }
   }
   deComplieBlockDataToHTML(block){
-    return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+    return `<${block.data.level} block-type="${this.type}">${block.data.text}</${block.data.level}>`
   }
 
   checkMdToolType(str){
@@ -79,7 +79,7 @@ export class HeadTool2 extends Plugin.ToolPluginBase {
     // blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
   }
   deComplieBlockDataToHTML(block){
-    return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+    return `<${block.data.level} block-type="${this.type}">${block.data.text}</${block.data.level}>`
   }
 
   checkMdToolType(str){
@@ -121,7 +121,7 @@ export class HeadTool3 extends Plugin.ToolPluginBase {
     }
   }
   deComplieBlockDataToHTML(block){
-    return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+    return `<${block.data.level} block-type="${this.type}">${block.data.text}</${block.data.level}>`
   }
 
   checkMdToolType(str){
@@ -164,7 +164,7 @@ export class HeadTool4 extends Plugin.ToolPluginBase {
     }
   }
   deComplieBlockDataToHTML(block){
-    return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+    return `<${block.data.level} block-type="${this.type}">${block.data.text}</${block.data.level}>`
   }
 
   checkMdToolType(str){
@@ -208,7 +208,7 @@ export class HeadTool5 extends Plugin.ToolPluginBase {
       // blockData.push(..._.compileHead(node.innerHTML,node.nodeName.toLowerCase()))
   }
   deComplieBlockDataToHTML(block){
-    return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+    return `<${block.data.level} block-type="${this.type}">${block.data.text}</${block.data.level}>`
   }
 
   checkMdToolType(str){
@@ -253,6 +253,6 @@ export class HeadTool6 extends Plugin.ToolPluginBase {
   }
 
   deComplieBlockDataToHTML(block){
-    return `<${block.data.level}>${block.data.text}</${block.data.level}>`
+    return `<${block.data.level} block-type="${this.type}">${block.data.text}</${block.data.level}>`
   }
 }

@@ -350,7 +350,16 @@ export function complieHTMLToBlockData(htmlString:string):OutputBlockData[]{
     function loopComplieNode(container,blockData){
       container.childNodes.forEach((child:HTMLElement)=>{
         if(child.nodeName == "DIV"){
-          loopComplieNode(child,blockData)
+          // TODO: 后续优化直接旁段dom里面的类型
+          let blockType = child.getAttribute("block-type")
+          if(blockType){
+            let toolPlugin = manager.getToolByType(blockType);
+            toolPlugin && toolPlugin?.complieHTMLToBlockData(child,blockData)
+            if(!toolPlugin){
+              console.log('【superDoc】:解析节点失败，暂无该节点解析器',`${blockType}`,child)
+            }
+          }else
+            loopComplieNode(child,blockData);
         }else {
           let toolPlugin = manager.getToolByNodeName(child.nodeName);
           toolPlugin && toolPlugin?.complieHTMLToBlockData(child,blockData)

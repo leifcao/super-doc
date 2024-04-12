@@ -354,5 +354,6 @@ export default class Ui extends Module {
       : {};
     this.nodes.toolbarWrapper.style.left = rect.left - hodlerRect.left - 60 + "px";
     this.nodes.toolbarWrapper.style.top = rect.top - hodlerRect.top + 3 + "px";
+    this.nodes.toolbarWrapper.classList.add(this.CSS.superDocToolbarOpen);
   }
 }

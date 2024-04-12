@@ -21,7 +21,7 @@
     </el-upload>
     <!-- 图片支持删除 -->
     <div v-else contenteditable="true" @keydown="imageKeydown">
-      <el-image contenteditable="true" :src="imagePath" :preview-src-list="[imagePath]"></el-image>
+      <el-image contenteditable="true" style="width:96%" :src="imagePath" :preview-src-list="[imagePath]"></el-image>
     </div>
   </div>
 </template>
@@ -59,7 +59,7 @@ export default {
       let url = URL.createObjectURL(event.file);
       this.imagePath = url
       // 不入执行栈的处理
-      this.blockData.PROXY_TARGET.file = event.file;
+      this.blockData.data.PROXY_TARGET.file = event.file;
       this.blockData.data.PROXY_TARGET.upload = true;
     },
     imageKeydown(event){
@@ -67,8 +67,10 @@ export default {
         let manager = this.$superConfig.blockData.BlockManager
         manager.removeBlock(this.blockId)
         event.preventDefault();
+        event.stopImmediatePropagation();
       }else{
         event.preventDefault();
+        event.stopImmediatePropagation();
       }
     },
     // 不严谨判断 ,暂时处理

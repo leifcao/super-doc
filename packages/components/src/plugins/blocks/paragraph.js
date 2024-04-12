@@ -19,6 +19,7 @@ export default class Paragraph extends Plugin.BlockBase {
     return _Paragraph;
   }
 
+  // 解析生成
   compileData(blockInstance,text){
     return _.compileParagraph(text)
   }
@@ -97,15 +98,19 @@ export default class Paragraph extends Plugin.BlockBase {
      }
   }
 
-  selectionCallBack(context,event,selectionDom, blockInstance){
-    console.log(`【superDoc】: 执行选中回调_paragraph`);
-    let manager = context.Editor.BlockManager
-    let text = selectionDom.querySelector("#superdoc-paragraph").innerHTML
-    let paragraphObject = generateParagraphData()
-    paragraphObject.data.text = text;
-    paragraphObject.id = blockInstance.id
-    manager.currentSelectionBlockInfo.data.push(paragraphObject)
-    // 记录选择的文本
-    manager.currentSelectionBlockInfo.selectionContent.push(text);
+  selectionCallBack(context,event,selectionDom, currentInstance,type = "text"){
+    try{
+      console.log(`【superDoc】: 执行选中回调_paragraph`);
+      let manager = context.Editor.BlockManager
+      let text = type == "text" ? selectionDom.innerHTML : selectionDom.querySelector("#superdoc-paragraph").innerHTML
+      let paragraphObject = generateParagraphData();
+      paragraphObject.data.text = text; // 选中文本的赋值
+      paragraphObject.id = currentInstance.id; // 赋值当前选中的文本的block实例id
+      manager.currentSelectionBlockInfo.data.push(paragraphObject) // 记录选中的blockData
+      // 记录选择的文本
+      manager.currentSelectionBlockInfo.selectionContent.push(text); // 记录选中的文本
+    }catch(e){
+      console.error(`【superDoc】: 执行选中回调_paragraph失败`, e);
+    }
   }
 }

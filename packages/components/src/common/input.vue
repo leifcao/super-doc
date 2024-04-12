@@ -32,7 +32,7 @@ export default {
       const _temp = document.createElement('p');
       _temp.innerHTML = this.content;
       this.syncDom(_temp);
-
+      this.addAttribute()
       // bindMenu(this.$refs['super-paragraph']);
     },
     /**
@@ -56,6 +56,11 @@ export default {
     },
     syncDom(newDom) {
       syncDom(this.$refs['super-paragraph'], newDom);
+    },
+    addAttribute(){
+      Object.entries(this.$attrs).forEach(([key,value])=>{
+        this.$refs['super-paragraph'].setAttribute(key, value);  
+      })
     },
     focus() {
       this.$refs['super-paragraph'].focus();

@@ -1,5 +1,7 @@
 import { isArray } from "@super-doc/share";
 import { SNAPSHOOT_TYPE } from "../../../timeMachine/src/typing";
+import TimeMachine from "@super-doc/time-machine";
+import CommandManager from "@super-doc/command-manager";
 
 export class ToolPluginBase {
   _type = null;
@@ -45,9 +47,18 @@ export class ToolPluginBase {
     }
   }
 
-  // undo
-  undo(timeMachine, context) {
-    let command = context.history.pop();
+  /**
+   * 撤销 undo
+   * @param timeMachine 时间线实例
+   * @param context // 撤销回退实例
+   * @param command // 传入的解析撤销回退命令数组 默认不传
+   */
+  undo(timeMachine: TimeMachine, context: CommandManager, command?:any[]) {
+    let isAddFuture 
+    if(!command) {
+      command = context.history.pop();
+      isAddFuture = true
+    }
     command.forEach((c) => {
       const { target, key, old: oldObj, new: newObj, type } = c;
       // const blockIndex = Number(target.OBJECT_PATH.split('.')[0].replace('[', '').replace(']', ''));
@@ -73,12 +84,21 @@ export class ToolPluginBase {
         }
       }
     });
-    context.addFuture(command);
+    isAddFuture && context.addFuture(command);
   }
 
-  // redo
-  redo(timeMachine, context) {
-    let command = context.future.pop();
+  /**
+   * 撤销 redo
+   * @param timeMachine 时间线实例
+   * @param context // 撤销回退实例
+   * @param command // 传入的解析撤销回退命令数组 默认不传
+   */
+  redo(timeMachine: TimeMachine, context: CommandManager, command?:any[]) {
+    let isAddHistory
+    if(!command){
+      command = context.future.pop();
+      isAddHistory = true
+    }
     command.forEach((c) => {
       const { target, key, old: oldObj, new: newObj, type } = c;
       if (type === SNAPSHOOT_TYPE.UPDATE) {
@@ -98,6 +118,6 @@ export class ToolPluginBase {
         }
       }
     });
-    context.addHistory(command);
+    isAddHistory && context.addHistory(command);
   }
 }
